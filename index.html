@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seznam Konferencí</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+<h2>Seznam Konferencí</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Název</th>
+            <th>Datum začátku</th>
+        </tr>
+    </thead>
+    <tbody id="conferenceTable">
+        <!-- Data budou vložena zde pomocí JavaScriptu -->
+    </tbody>
+</table>
+
+<script>
+// Načtení konferencí z PHP skriptu
+fetch('get_conferences.php')
+    .then(response => response.json())
+    .then(data => {
+        const tableBody = document.getElementById('conferenceTable');
+        data.forEach(conference => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${conference.name}</td><td>${new Date(conference.start_datetime).toLocaleString()}</td>`;
+            tableBody.appendChild(row);
+        });
+    })
+    .catch(error => console.error('Chyba při načítání dat:', error));
+</script>
+
+</body>
+</html>
