@@ -1,3 +1,8 @@
+<?php
+session_start();
+$isLoggedIn = isset($_SESSION['user_id']);
+?>
+
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -11,16 +16,19 @@
 
     <div class="header-container">
         <h2 style="float: left;">
-            <a href="index.html" style="text-decoration: none; color: inherit;">
+            <a href="index.php" style="text-decoration: none; color: inherit;">
                 <i class="fas fa-home" style="margin-right: 5px;"></i>
                 Konference
             </a>
         </h2>
-        <a href="login.html" class="login-button">Login</a>
+        <?php if ($isLoggedIn): ?>
+            <!-- Tlačítko Logout, pokud je uživatel přihlášen -->
+            <a href="logout.php" class="login-button">Logout</a>
+        <?php else: ?>
+            <!-- Tlačítko Login, pokud není uživatel přihlášen -->
+            <a href="login.html" class="login-button">Login</a>
+        <?php endif; ?>
     </div>
-    <!--<h2>
-    <a href="index.html"><i class="fas fa-home" style="margin-right: 5px;"></i></a>
-    Konference</h2>-->
     
     <div class="body">
         <table>
@@ -30,7 +38,7 @@
     </div>
     
     <a href="add.html" class="fixed-button">
-        <i class="fas fa-plus"></i> <!-- Ikona + -->
+        <i class="fas fa-plus"></i>
     </a>
 
 <script>
@@ -104,7 +112,6 @@ fetch('get_conferences.php')
 
         // Přidání hlavního kontejneru do tableBody
         tableBody.appendChild(mainContainer);
-
 
     })
     .catch(error => console.error('Chyba při načítání dat:', error));
