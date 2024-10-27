@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: index.php"); // Go to index.php
         exit;
     } else {
-        echo "<script>alert('Došlo k chybě při registraci.'); window.location.href='register.html';</script>";
+        echo "<script>alert('There has been unexpected error in registration'); window.location.href='register.html';</script>";
     }
     
     $stmt->close();
