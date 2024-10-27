@@ -1,0 +1,105 @@
+
+body 
+{ 
+    font-family: Arial, sans-serif; 
+    margin: 0;
+}
+.body
+{
+    max-width: 70%;
+    margin: auto;
+    box-sizing: border-box;
+
+}
+table 
+{ 
+    width: 100%; border-collapse: collapse; 
+}
+th
+{ 
+    padding: 1vw;
+    text-align: left; 
+}
+td
+{
+    padding: 0.2vw;
+    text-align: left; 
+}
+th 
+{ 
+    background-color: #f2f2f2; 
+}
+h2
+{
+    padding: 1vw;
+    margin: 0;
+    /*margin-bottom: 2vw;*/
+    color: white;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+h2 a
+{
+    text-decoration: none;
+    color: inherit;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    overflow: auto;
+    background-color: #4d4d4d;
+    margin-bottom: 2vw;
+}
+.login-button {
+    float: right;
+    padding: 0.6vw 1.3vw; 
+    background-color: #BD2A2E; 
+    color: white; 
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    text-decoration: none; 
+    font-size: 16px; 
+    margin-right: 1vw;
+}
+.login-button:hover {
+    background-color: #92292d;
+}
+
+.conference
+{
+    width: 80%;
+    margin-bottom: 0.5%;
+    margin-top: 0.5%;
+    background-color: #DEDEDE;
+    border-radius: 15px;
+    padding: 0.5vw;
+}
+
+
+.fixed-button {
+    position: fixed; /* Fixní pozice */
+    bottom: 2vw; /* Vzdálenost od spodní části */
+    right: 2vw; /* Vzdálenost od pravé části */
+    width: 4vw; /* Šířka tlačítka */
+    height: 4vw; /* Výška tlačítka */
+    background-color: #007BFF; /* Barva pozadí */
+    color: white; /* Barva ikony */
+    border: none; /* Bez rámečku */
+    border-radius: 50%; /* Kulaté tlačítko */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Stín */
+    cursor: pointer; /* Změna kurzoru na ruku */
+    display: flex; /* Flexbox pro vycentrování ikony */
+    justify-content: center; /* Horizontální zarovnání */
+    align-items: center; /* Vertikální zarovnání */
+    font-size: 2vw; /* Velikost ikony */
+    transition: background-color 0.3s; /* Efekt přechodu při hoveru */
+    text-decoration: none; /* Zrušení podtržení odkazu */
+}
+
+/* Efekt pro hover */
+.fixed-button:hover {
+    background-color: #0056b3; /* Tmavší modrá při hoveru */
+}
