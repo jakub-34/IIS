@@ -77,6 +77,15 @@ h2 a
     padding: 0.5vw;
 }
 
+.user {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    padding: 5px 10px 20px 10px;
+    background-color: #DEDEDE;
+    border-radius: 15px;
+}
+
 
 .fixed-button {
     position: fixed; /* Fixní pozice */

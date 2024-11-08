@@ -17,10 +17,10 @@
             </a>
         </h2>
         <div style="float: right;">
-            <!-- Dynamické tlačítko Admin Page a Login/Logout -->
-            <a href="admin_page.html" id="adminPageButton" class="login-button" style="display: none; margin-right: 10px;">Admin Page</a>
             <!-- Tlačítko Login/Logout -->
             <a href="login.html" id="loginLogoutButton" class="login-button">Login</a>
+            <!-- Dynamické tlačítko Admin Page a Login/Logout -->
+            <a href="admin_page.html" id="adminPageButton" class="login-button" style="display: none; margin-right: 10px;">Admin Page</a>
         </div>
     </div>
     
@@ -51,7 +51,7 @@ function checkLoginStatus() {
                 if (data.role === 'admin') {
                     adminPageButton.style.display = 'inline-block';
                 }
-                
+
             } else {
                 loginLogoutButton.textContent = 'Login';
                 loginLogoutButton.href = 'login.html';

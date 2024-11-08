@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seznam Uživatelů</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <h2 style="float: left;">
+            <a href="index.html" style="text-decoration: none; color: inherit;">
+                <i class="fas fa-home" style="margin-right: 5px;"></i>
+                Konference
+            </a>
+        </h2>
+        <div style="float: right;">
+            <a href="logout.php" id="loginLogoutButton" class="login-button">Logout</a>
+        </div>
+    </div>
+    
+    <div class="body">
+        <table>
+            <tbody id="userTable">
+            </tbody>
+        </table>
+    </div>
+    
+
+    <script>
+        // Načtení uživatelů z PHP skriptu
+        fetch('get_users.php')
+            .then(response => response.json())
+            .then(data => {
+                var count = 1;
+                const tableBody = document.getElementById('userTable');
+        
+                // Hlavní obalovací div pro dva sloupce
+                const mainContainer = document.createElement('div');
+                mainContainer.style.display = 'flex';
+                mainContainer.style.justifyContent = 'space-between';
+                mainContainer.style.gap = '20px';
+        
+                // Levý a pravý sloupec
+                const leftColumn = document.createElement('div');
+                leftColumn.style.flex = '1';
+        
+                const rightColumn = document.createElement('div');
+                rightColumn.style.flex = '1';
+        
+                // Iterace přes data uživatelů
+                data.forEach(user => {
+                    const containerDiv = document.createElement('div');
+                    containerDiv.className = "user";
+        
+                    // První řádek s jménem a příjmením
+                    const nameRow = document.createElement('p');
+                    nameRow.textContent = `${user.name} ${user.lastname}`;
+                    nameRow.style.fontWeight = 'bold';
+                    nameRow.style.marginBottom = '5px';
+        
+                    // Druhý řádek s uživatelským jménem a roli
+                    const roleRow = document.createElement('div');
+                    roleRow.style.display = 'flex';
+                    roleRow.style.alignItems = 'center';
+        
+                    const username = document.createElement('span');
+                    username.textContent = user.username;
+                    username.style.marginRight = '10px';
+        
+                    const roleLabel = document.createElement('label');
+                    roleLabel.textContent = 'Admin';
+                    roleLabel.style.marginRight = '5px';
+        
+                    const roleCheckbox = document.createElement('input');
+                    roleCheckbox.type = 'checkbox';
+                    roleCheckbox.checked = (user.role === 'admin');
+                    roleCheckbox.disabled = true; // Zabrání úpravám
+        
+                    // Přidání prvků do roleRow
+                    roleRow.appendChild(username);
+                    roleRow.appendChild(roleLabel);
+                    roleRow.appendChild(roleCheckbox);
+        
+                    // Přidání řádků do containerDiv
+                    containerDiv.appendChild(nameRow);
+                    containerDiv.appendChild(roleRow);
+        
+                    // Přidání do levého nebo pravého sloupce podle sudosti/lichosti
+                    if (count % 2 !== 0) {
+                        leftColumn.appendChild(containerDiv);
+                    } else {
+                        rightColumn.appendChild(containerDiv);
+                    }
+        
+                    count++;
+                });
+        
+                mainContainer.appendChild(leftColumn);
+                mainContainer.appendChild(rightColumn);
+                tableBody.appendChild(mainContainer);
+        
+            })
+            .catch(error => console.error('Chyba při načítání dat:', error));
+        </script>
+        
+
+</body>
+</html>
