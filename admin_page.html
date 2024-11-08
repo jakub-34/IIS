@@ -30,38 +30,38 @@
     
 
     <script>
-        // Načtení uživatelů z PHP skriptu
+        // Load users from the server
         fetch('get_users.php')
             .then(response => response.json())
             .then(data => {
                 var count = 1;
                 const tableBody = document.getElementById('userTable');
         
-                // Hlavní obalovací div pro dva sloupce
+                // Main div
                 const mainContainer = document.createElement('div');
                 mainContainer.style.display = 'flex';
                 mainContainer.style.justifyContent = 'space-between';
                 mainContainer.style.gap = '20px';
         
-                // Levý a pravý sloupec
+                // Main left and right columns
                 const leftColumn = document.createElement('div');
                 leftColumn.style.flex = '1';
         
                 const rightColumn = document.createElement('div');
                 rightColumn.style.flex = '1';
         
-                // Iterace přes data uživatelů
+                // Iterate over users
                 data.forEach(user => {
                     const containerDiv = document.createElement('div');
                     containerDiv.className = "user";
         
-                    // První řádek s jménem a příjmením
+                    // First row with user name and surname
                     const nameRow = document.createElement('p');
                     nameRow.textContent = `${user.name} ${user.lastname}`;
                     nameRow.style.fontWeight = 'bold';
                     nameRow.style.marginBottom = '5px';
         
-                    // Druhý řádek s uživatelským jménem a roli
+                    // Second row with user role and username
                     const roleRow = document.createElement('div');
                     roleRow.style.display = 'flex';
                     roleRow.style.alignItems = 'center';
@@ -77,18 +77,18 @@
                     const roleCheckbox = document.createElement('input');
                     roleCheckbox.type = 'checkbox';
                     roleCheckbox.checked = (user.role === 'admin');
-                    roleCheckbox.disabled = true; // Zabrání úpravám
+                    roleCheckbox.disabled = true; // for now
         
-                    // Přidání prvků do roleRow
+                    // Add elements to the container
                     roleRow.appendChild(username);
                     roleRow.appendChild(roleLabel);
                     roleRow.appendChild(roleCheckbox);
         
-                    // Přidání řádků do containerDiv
+                    // Add rows to the container
                     containerDiv.appendChild(nameRow);
                     containerDiv.appendChild(roleRow);
         
-                    // Přidání do levého nebo pravého sloupce podle sudosti/lichosti
+                    // Add to left or right column
                     if (count % 2 !== 0) {
                         leftColumn.appendChild(containerDiv);
                     } else {
