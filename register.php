@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['username'] = $username;
         $_SESSION['role'] = 'registered';
 
-        header("Location: index.php"); // Go to index.php
+        header("Location: index.html"); // Go to index.html
         exit;
     } else {
         echo "<script>alert('There has been unexpected error in registration'); window.location.href='register.html';</script>";

@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['username'] = $username_db;
             $_SESSION['role'] = $role;
 
-            header("Location: index.php"); // Go to index.php
+            header("Location: index.html"); // Go to index.html
             exit;
         } else {
             echo "<script>alert('Wrong username or password.'); window.location.href='login.html';</script>";
