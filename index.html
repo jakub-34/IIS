@@ -16,8 +16,12 @@
                 Konference
             </a>
         </h2>
-        <!-- Dynamické tlačítko Login/Logout -->
-        <a href="login.html" id="loginLogoutButton" class="login-button">Login</a>
+        <div style="float: right;">
+            <!-- Dynamické tlačítko Admin Page a Login/Logout -->
+            <a href="admin_page.html" id="adminPageButton" class="login-button" style="display: none; margin-right: 10px;">Admin Page</a>
+            <!-- Tlačítko Login/Logout -->
+            <a href="login.html" id="loginLogoutButton" class="login-button">Login</a>
+        </div>
     </div>
     
     <div class="body">
@@ -38,9 +42,16 @@ function checkLoginStatus() {
         .then(response => response.json())
         .then(data => {
             const loginLogoutButton = document.getElementById('loginLogoutButton');
+            const adminPageButton = document.getElementById('adminPageButton');
+
             if (data.isLoggedIn) {
                 loginLogoutButton.textContent = 'Logout';
                 loginLogoutButton.href = 'logout.php';
+
+                if (data.role === 'admin') {
+                    adminPageButton.style.display = 'inline-block';
+                }
+                
             } else {
                 loginLogoutButton.textContent = 'Login';
                 loginLogoutButton.href = 'login.html';
