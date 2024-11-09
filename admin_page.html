@@ -30,6 +30,14 @@
     
 
     <script>
+        let currentUser = null;
+        // Check logged in user
+        fetch('check_session.php')
+            .then(response => response.json())
+            .then(data => {
+                currentUser = data.username;
+            })
+            .catch(error => console.error('Error loading data:', error));
         // Load users from the server
         fetch('get_users.php')
             .then(response => response.json())
@@ -54,6 +62,7 @@
                 data.forEach(user => {
                     const containerDiv = document.createElement('div');
                     containerDiv.className = "user";
+                    containerDiv.style.position = 'relative';
         
                     // First row with user name and surname
                     const nameRow = document.createElement('p');
@@ -77,7 +86,35 @@
                     const roleCheckbox = document.createElement('input');
                     roleCheckbox.type = 'checkbox';
                     roleCheckbox.checked = (user.role === 'admin');
-                    roleCheckbox.disabled = true; // for now
+                    if (currentUser === user.username) {
+                        roleCheckbox.disabled = true;
+                    }
+                    else {
+                        roleCheckbox.addEventListener('change', () => {
+                            // Send request to update role
+                            updateRole(user.user_id, roleCheckbox.checked ? 'admin' : 'registered');
+                        });
+                    }
+
+                    // Add delete icon
+                    const deleteIcon = document.createElement('i');
+                    deleteIcon.className = 'fas fa-trash'; // Icon of trash
+                    deleteIcon.style.color = currentUser === user.username ? 'gray' : 'red';
+                    deleteIcon.style.cursor = currentUser === user.username ? 'not-allowed' : 'pointer';
+                    deleteIcon.style.position = 'absolute';
+                    deleteIcon.style.top = '50%';
+                    deleteIcon.style.right = '10px';
+                    deleteIcon.style.transform = 'translateY(-50%)';
+                    deleteIcon.style.fontSize = '24px';
+                    if (currentUser !== user.username) {
+                        deleteIcon.addEventListener('click', () => {
+                            // Display confirmation dialog
+                            const confirmation = confirm(`Are you sure to delete: '${user.username}'?`);
+                            if (confirmation) {
+                                deleteUser(user.user_id);
+                            }
+                        });
+                    }
         
                     // Add elements to the container
                     roleRow.appendChild(username);
@@ -87,6 +124,7 @@
                     // Add rows to the container
                     containerDiv.appendChild(nameRow);
                     containerDiv.appendChild(roleRow);
+                    containerDiv.appendChild(deleteIcon);
         
                     // Add to left or right column
                     if (count % 2 !== 0) {
@@ -103,9 +141,49 @@
                 tableBody.appendChild(mainContainer);
         
             })
-            .catch(error => console.error('Chyba při načítání dat:', error));
-        </script>
-        
+            .catch(error => console.error('Error loading data:', error));
 
+        // Function to update user role
+        function updateRole(userId, newRole) {
+            fetch('update_role.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id: userId, role: newRole })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(`Role of user with ID ${userId} was succesfully changet to ${newRole}.`);
+                } else {
+                    console.error('Error with changing role:', data.error);
+                }
+            })
+            .catch(error => console.error('Error sending data:', error));
+        }
+
+        // Function to delete user
+        function deleteUser(userId) {
+            fetch('delete_user.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(`User with ID ${userId} was succesfully deleted.`);
+                    location.reload(); // Reload the page
+                } else {
+                    alert(data.error);
+                    console.error('Error deleting users:', data.error);
+                }
+            })
+            .catch(error => console.error('Error sending data:', error));
+        }
+    </script>
 </body>
 </html>
