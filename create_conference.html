@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrace</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Red border for wrong data */
+        .error-border {
+            border: 2px solid red;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <h2 style="float: left;">
+            <a href="index.html" style="text-decoration: none; color: inherit;">
+                <i class="fas fa-home" style="margin-right: 5px;"></i>
+                Konference
+            </a>
+        </h2>
+        <a href="login.html" class="login-button">Login</a>
+    </div>
+
+    <div class="body">
+        <form action="create_conference.php" method="POST" style="max-width: 450px; margin: auto; padding: 2vw 4vw 4vw 2vw; background-color: #DEDEDE; border-radius: 15px;">
+            <h2>New Conference</h2>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
+
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
+
+            <label for="genre">Genre:</label>
+            <input type="text" id="genre" name="genre" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
+
+            <label for="location">Location:</label>
+            <input type="text" id="location" name="location" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
+
+            <label for="start_datetime">Start:</label>
+            <input type="datetime-local" id="start_datetime" name="start_datetime" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
+
+            <label for="end_datetime">End:</label>
+            <input type="datetime-local" id="end_datetime" name="end_datetime" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
+
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
+
+            <label for="capacity">Capacity:</label>
+            <input type="number" id="capacity" name="capacity" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
+
+            <div style="display: flex; justify-content: center; margin-top: 2vw;">
+                <button type="submit" class="login-button" style="width: 100%; max-width: 200px;">Create</button>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

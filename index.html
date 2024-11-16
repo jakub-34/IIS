@@ -31,7 +31,7 @@
         </table>
     </div>
     
-    <a href="add.html" class="fixed-button">
+    <a href="create_conference.html" class="fixed-button" id="create_conference" style="display: none;">
         <i class="fas fa-plus"></i>
     </a>
 
@@ -43,10 +43,12 @@ function checkLoginStatus() {
         .then(data => {
             const loginLogoutButton = document.getElementById('loginLogoutButton');
             const adminPageButton = document.getElementById('adminPageButton');
+            const conferenceButton = document.getElementById('create_conference');
 
             if (data.isLoggedIn) {
                 loginLogoutButton.textContent = 'Logout';
                 loginLogoutButton.href = 'logout.php';
+                conferenceButton.style.display = 'flex'
 
                 if (data.role === 'admin') {
                     adminPageButton.style.display = 'inline-block';
@@ -104,7 +106,7 @@ fetch('get_conferences.php')
             wrapperDiv.appendChild(row1);
 
             const row2 = document.createElement('tr');
-            row2.innerHTML = `<td>${new Date(conference.start_datetime).getDate()}.${new Date(conference.start_datetime).getMonth() + 1}. - ${new Date(conference.end_datetime).toLocaleDateString()}</td><td>${new Date(conference.start_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>-<td>${new Date(conference.end_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>`;
+            row2.innerHTML = `<td>${new Date(conference.start_datetime).toLocaleDateString()} - ${new Date(conference.end_datetime).toLocaleDateString()}</td><td>${new Date(conference.start_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>-<td>${new Date(conference.end_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>`;
             wrapperDiv.appendChild(row2);
 
             containerDiv.appendChild(text);
