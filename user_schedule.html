@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Osobní rozvrh</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+    <div class="header-container">
+        <h2 style="float: left;">
+            <a href="index.html" style="text-decoration: none; color: inherit;">
+                <i class="fas fa-home" style="margin-right: 5px;"></i>
+                Konference
+            </a>
+        </h2>
+        <div style="float: right;">
+            <a href="logout.php" id="loginLogoutButton" class="login-button">Logout</a>
+        </div>
+    </div>
+    
+    <div class="body">
+        <h2>Osobní rozvrh</h2>
+        <div id="scheduleContainer" style="margin-top: 20px;">
+            <p id="emptySchedule" style="display: none; color: gray; text-align: center;">Osobní rozvrh je prázdný</p>
+            <table id="scheduleTable" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Name of presentation</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Room</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Fetch user schedule
+        fetch('get_user_schedule.php')
+            .then(response => response.json())
+            .then(data => {
+                const scheduleTable = document.getElementById('scheduleTable');
+                const emptySchedule = document.getElementById('emptySchedule');
+                const tbody = scheduleTable.querySelector('tbody');
+
+                if (data.length === 0) {
+                    // Show message if schedule is empty
+                    emptySchedule.style.display = 'block';
+                    scheduleTable.style.display = 'none';
+                } else {
+                    // Populate the table with schedule data
+                    emptySchedule.style.display = 'none';
+                    scheduleTable.style.display = 'table';
+
+                    data.forEach(presentation => {
+                        const row = document.createElement('tr');
+                        
+                        row.innerHTML = `
+                            <td>${presentation.title}</td>
+                            <td>${presentation.description}</td>
+                            <td>${presentation.date}</td>
+                            <td>${presentation.start_time} - ${presentation.end_time}</td>
+                            <td>${presentation.room_name}</td>
+                        `;
+
+                        tbody.appendChild(row);
+                    });
+                }
+            })
+            .catch(error => console.error('Chyba při načítání rozvrhu:', error));
+    </script>
+
+</body>
+</html>
