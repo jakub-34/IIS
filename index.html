@@ -94,7 +94,7 @@ fetch('get_conferences.php')
             containerDiv.style.cursor = 'pointer';
 
             containerDiv.onclick = () => {
-                window.location.href = `conference_details.php?id=${conference.conference_id}`;
+                window.location.href = `conference_details.html?id=${conference.conference_id}`;
             };
 
             const text = document.createElement('p');
