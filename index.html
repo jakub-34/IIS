@@ -101,7 +101,7 @@ fetch('get_conferences.php')
             wrapperDiv.className = "conference";
 
             const row1 = document.createElement('tr');
-            row1.innerHTML = `<td colspan="2">${conference.name}</td>`;
+            row1.innerHTML = `<td colspan="2" style="font-weight: bold;">${conference.name}</td>`;
             row1.style.paddingBottom = '10vw';
             wrapperDiv.appendChild(row1);
 
