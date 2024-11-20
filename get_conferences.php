@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 }
 
 // SQL dotaz pro načtení konferencí
-$sql = "SELECT name, start_datetime, end_datetime FROM conferences";
+$sql = "SELECT conference_id, name, start_datetime, end_datetime FROM conferences";
 $result = $conn->query($sql);
 
 // Převedení výsledků do JSON formátu
