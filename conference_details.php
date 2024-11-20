@@ -1,78 +1,38 @@
 <?php
-include 'db_config.php'; // Připojení k databázi
+// Nastavení připojení k databázi
+$servername = "localhost"; // Hostitel databáze
+$username = "xfurik00";    // Uživatel databáze
+$password = "5ujomzam"; // Heslo databáze
+$database = "xfurik00";      // Název databáze
 
-if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-    $conference_id = $_GET['id'];
+// Vytvoření připojení
+$conn = new mysqli($servername, $username, $password, $database);
 
-    $sql = "SELECT * FROM conferences WHERE conference_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $conference_id);
-    $stmt->execute();
-    
-    $stmt->store_result();
-    $stmt->bind_result($conference_id, $name, $description, $genre, $location, $start_datetime, $end_datetime, $price, $capacity, $organizer_id);
+// Kontrola připojení
+if ($conn->connect_error) {
+    die("Připojení selhalo: " . $conn->connect_error);
+}
 
-    if ($stmt->fetch()) {
-        $conference = [
-            'conference_id' => $conference_id,
-            'name' => $name,
-            'description' => $description,
-            'genre' => $genre,
-            'location' => $location,
-            'start_datetime' => $start_datetime,
-            'end_datetime' => $end_datetime,
-            'price' => $price,
-            'capacity' => $capacity,
-            'organizer_id' => $organizer_id
-        ];
-    } else {
-        echo "Konferencia nebola nájdená.";
-        exit;
+$conference_id = isset($_GET['conference_id']) ? intval($_GET['conference_id']) : 0;
+if ($conference_id === 0)
+{
+    echo('asdasd');
+}
+
+// SQL dotaz pro načtení konferencí
+$sql = "SELECT presentation_id, title, description FROM presentations WHERE conference_id = $conference_id";
+$result = $conn->query($sql);
+
+// Převedení výsledků do JSON formátu
+$presentation = array();
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $presentation[] = $row;
     }
-} else {
-    echo "Neplatné ID konferencie.";
-    exit;
 }
 $conn->close();
 
+// Nastavení hlavičky a výpis JSON
+header('Content-Type: application/json');
+echo json_encode($presentation);
 ?>
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seznam Konferencí</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-
-    <div class="header-container">
-        <h2 style="float: left;">
-            <a href="index.html" style="text-decoration: none; color: inherit;">
-                <i class="fas fa-home" style="margin-right: 5px;"></i>
-                Konference
-            </a>
-        </h2>
-        <div style="float: right;">
-            <a href="login.html" id="loginLogoutButton" class="login-button">Login</a>
-            <a href="admin_page.html" id="adminPageButton" class="login-button" style="display: none; margin-right: 10px;">Admin Page</a>
-        </div>
-    </div>
-    
-
-    <?php if (isset($conference)): ?>
-        <p><strong><?php echo htmlspecialchars($conference['name']); ?></strong></p>
-        <p><strong>Popis:</strong> <?php echo htmlspecialchars($conference['description']); ?></p>
-        <p><strong>Žáner:</strong> <?php echo htmlspecialchars($conference['genre']); ?></p>
-        <p><strong>Miesto:</strong> <?php echo htmlspecialchars($conference['location']); ?></p>
-        <p><strong>Začiatok:</strong> <?php echo htmlspecialchars($conference['start_datetime']); ?></p>
-        <p><strong>Koniec:</strong> <?php echo htmlspecialchars($conference['end_datetime']); ?></p>
-        <p><strong>Cena:</strong> €<?php echo htmlspecialchars($conference['price']); ?></p>
-        <p><strong>Kapacita:</strong> <?php echo htmlspecialchars($conference['capacity']); ?> osôb</p>
-    <?php else: ?>
-        <p>Konferencia nebola nájdená.</p>
-    <?php endif; ?>
-
-</body>
-</html>
