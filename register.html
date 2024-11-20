@@ -12,6 +12,22 @@
             border: 2px solid red;
         }
     </style>
+        <script>
+            // Check if the user is logged in and has the admin role
+            fetch('check_session.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.isLoggedIn) {
+                        // Redirect to the main page
+                        window.location.href = 'index.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking session:', error);
+                    // Redirect to the main page in case of an error
+                    window.location.href = 'index.html';
+                });
+        </script>
 </head>
 <body>
 
