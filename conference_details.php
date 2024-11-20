@@ -14,13 +14,9 @@ if ($conn->connect_error) {
 }
 
 $conference_id = isset($_GET['conference_id']) ? intval($_GET['conference_id']) : 0;
-if ($conference_id === 0)
-{
-    echo('asdasd');
-}
 
 // SQL dotaz pro načtení konferencí
-$sql = "SELECT presentation_id, title, description FROM presentations WHERE conference_id = $conference_id";
+$sql = "SELECT presentation_id, title, description, status, date, start_time, end_time FROM presentations WHERE conference_id = $conference_id AND status = 'approved'";
 $result = $conn->query($sql);
 
 // Převedení výsledků do JSON formátu

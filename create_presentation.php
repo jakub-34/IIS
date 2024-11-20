@@ -14,8 +14,9 @@ if ($conn->connect_error) {
 }
 
 // Získání ID konference z URL
+var_dump($_POST);
 $conference_id = isset($_POST['conference_id']) ? intval($_POST['conference_id']) : null;
-
+var_dump($conference_id);
 if ($conference_id === null) {
     echo "Chyba: ID konference není definováno!";
     exit;

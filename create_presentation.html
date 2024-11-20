@@ -32,5 +32,35 @@
         <textarea name="description" style="height: 100px;" placeholder="Popis" required></textarea>
         <button type="submit" class="add-conference-button">Odeslat</button>
     </form>
+
+    <script>
+        document.getElementById("presentationForm").addEventListener("submit", function(e) {
+            e.preventDefault();  // Zabraňuje defaultnímu odeslání formuláře
+        
+            const formData = new FormData(this);
+            
+            // Přidáme `conference_id` z URL do FormData
+            const conferenceId = new URLSearchParams(window.location.search).get('conference_id');
+            formData.append('conference_id', conferenceId);  // Přidáme ID do formuláře
+            
+            // Odeslání dat na backend
+            fetch('create_presentation.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())  // Nebo response.json(), pokud vrací JSON
+            .then(data => {
+                console.log(data);
+                alert('Prezentace byla odeslána!');
+                const previousPage = sessionStorage.getItem('previousPage');
+                if (previousPage) {
+                    window.location.href = previousPage; // Přejít zpět na původní stránku
+                } else {
+                    window.location.href = 'conference_details.html'; // Pokud není uložena stránka, přejdeme na defaultní
+                }
+            })
+            .catch(error => console.error('Chyba při odesílání formuláře:', error));
+        });
+    </script>
 </body> 
 </html>

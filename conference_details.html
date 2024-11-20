@@ -87,7 +87,7 @@ function checkLoginStatus() {
 
 // Načtení stavu přihlášení po otevření stránky
 checkLoginStatus();
-
+sessionStorage.setItem('previousPage', window.location.href);
 
 // Načtení prezentací z PHP skriptu
 const conferenceId = getConferenceId();
@@ -131,20 +131,20 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
             wrapperDiv.className = "conference";
 
             const row1 = document.createElement('tr');
-            row1.innerHTML = `<td style="font-weight: bold;">${conference.title}</td>`;
+            row1.innerHTML = `<td colspan="2" style="font-weight: bold;">${conference.title}</td>`;
             row1.style.paddingBottom = '10vw';
             wrapperDiv.appendChild(row1);
 
             const row2 = document.createElement('tr');
             //row2.innerHTML = `<td>${new Date(conference.start_datetime).toLocaleDateString()} - ${new Date(conference.end_datetime).toLocaleDateString()}</td><td>${new Date(conference.start_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>-<td>${new Date(conference.end_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>`;
-            row2.innerHTML = `<td>${conference.description}</td>`;
+            row2.innerHTML = `<td colspan="2">${conference.description}</td>`;
             wrapperDiv.appendChild(row2);
 
             const row3 = document.createElement('tr');
-            row3.innerHTML =    `<td>
-                                    <label>Schváleno</label>
-                                    <input type="checkbox">
-                                </td>`;
+            row3.innerHTML = `<td>${new Date(conference.date).toLocaleDateString('cs-CZ')}</td><td>
+                ${conference.start_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')} - 
+    ${conference.end_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')}
+    </td>`;
             wrapperDiv.appendChild(row3);
 
 
