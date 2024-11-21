@@ -14,8 +14,8 @@
             <a href="index.html" style="text-decoration: none; color: inherit;">
                 <i class="fas fa-home" style="margin-right: 5px;"></i>
             </a>
-            <a href="#">Presentations</a>
-            <a href="suggestions.html" style="opacity: 0.5; margin-left: 0.8vw;">Suggestions</a>
+            <a id="backLink" href="#" style="opacity: 0.5;">Presentations</a>
+            <a style="margin-left: 0.8vw;" href="#">Suggestions</a>
         </h2>
         <div style="float: right;">
             <!-- Tlačítko Login/Logout -->
@@ -38,6 +38,11 @@
     </a>
 
 <script>
+
+
+if (sessionStorage.getItem('previousPage')) {
+    document.getElementById('backLink').href = sessionStorage.getItem('previousPage');
+}
 // Funkce pro získání ID konference z URL parametru
 function getConferenceId() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -146,17 +151,9 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
             const row3 = document.createElement('tr');
             row3.innerHTML = `<td>${new Date(conference.date).toLocaleDateString('cs-CZ')}</td><td>
                 ${conference.start_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')} - 
-                ${conference.end_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')}
-                </td>`;
+    ${conference.end_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')}
+    </td>`;
             wrapperDiv.appendChild(row3);
-
-            const row4 = document.createElement('tr');
-            row4.innerHTML = `
-                <td colspan="2">
-                    <label for="checkbox-${count}">Add to schedule</label>
-                    <input type="checkbox" id="checkbox-${count}" name="conference-${count}" value="${conference.conference_id}">
-                </td>`;
-            wrapperDiv.appendChild(row4);
 
 
             containerDiv.appendChild(text);
