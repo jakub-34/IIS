@@ -20,6 +20,42 @@
             <a href="logout.php" id="loginLogoutButton" class="login-button">Logout</a>
         </div>
     </div>
+    <script>
+        function getConferenceId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('conference_id'); 
+        }
+        const conferenceId = getConferenceId();
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.querySelector("form");
+            form.action = `reserve_tickets.php?conference_id=${conferenceId}`;
+        });
+
+    </script>
+
+
+    <div class="body" style="max-width: 450px; margin: auto; padding: 2vw 4vw; background-color: #DEDEDE; border-radius: 15px; align-items: center;">
+        <form method="POST" >
+            <h2>Reserve Tickets</h2>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
+            <label for="lastname">Surname:</label>
+            <input type="text" id="lastname" name="lastname" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
+            <label for="tickets_count">Number of Tickets:</label>
+            <input type="number" id="tickets_count" name="tickets_count" required min="1" style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
+            <label for="payment_status">Payment Status:</label>
+            <select id="payment_status" name="payment_status" style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box;">
+                <option value="pending">pay on the spot</option>
+                <option value="paid">pay now</option>
+            </select>
+            <div style="display: flex; justify-content: center; margin-top: 2vw;">
+                <button type="submit" class="login-button" style="width: 100%; max-width: 200px;">Proceed</button>
+            </div>
+        </form>
+        <div style="text-align: center; margin-top: 0.5vw;">
+            <a href="register.html" style="font-size: 0.9em; text-decoration: none;">Register</a>
+        </div>
+    </div>
 
 </body>
 </html>

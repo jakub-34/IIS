@@ -168,7 +168,7 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
 
         const reserveTicketButton = document.createElement('a');
         reserveTicketButton.id = 'reserve_ticket_button';
-        reserveTicketButton.href = 'reserve_tickets.html';
+        reserveTicketButton.href = `reserve_tickets.html?conference_id=${conferenceDetails.conference_id}`;
         reserveTicketButton.textContent = 'Reserve Ticket';
         reserveTicketButton.style.display = 'inline-block';
         reserveTicketButton.style.color = 'black';

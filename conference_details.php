@@ -17,7 +17,7 @@ if ($conn->connect_error) {
 $conference_id = isset($_GET['conference_id']) ? intval($_GET['conference_id']) : 0;
 
 // SQL dotaz pro načtení detailů konferencie
-$sql_conference = "SELECT name, description, location, start_datetime, end_datetime, capacity, genre FROM conferences WHERE conference_id = $conference_id";
+$sql_conference = "SELECT conference_id, name, description, location, start_datetime, end_datetime, capacity, genre FROM conferences WHERE conference_id = $conference_id";
 $result_conference = $conn->query($sql_conference);
 
 // Inicializácia dát
