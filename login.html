@@ -38,6 +38,7 @@
     <div class="body">
         <form action="login.php" method="POST" style="max-width: 450px; margin: auto; padding: 2vw 4vw 4vw 2vw; background-color: #DEDEDE; border-radius: 15px;">
             <h2>Login</h2>
+            <input type="hidden" id="previousPage" name="previousPage" value="">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
             
@@ -52,6 +53,10 @@
                 <a href="register.html" style="font-size: 0.9em; text-decoration: none;">Register</a>
             </div>
         </form>
+        <script>
+            // Set the previous page URL in the hidden input
+            document.getElementById('previousPage').value = document.referrer || 'index.html';
+        </script>
     </div>
 
 </body>

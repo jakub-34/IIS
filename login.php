@@ -6,6 +6,7 @@ session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
+    $previousPage = $_POST['previousPage'] ?? 'index.html';
 
     // Find user in database
     $stmt = $conn->prepare("SELECT user_id, username, password, role FROM users WHERE username = ?");
@@ -20,7 +21,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['username'] = $username_db;
             $_SESSION['role'] = $role;
 
-            $previousPage = $_SERVER['HTTP_REFERER'] ?? 'index.html'; // Default to index.html if referer is not set
             header("Location: $previousPage");
             exit;
         } else {
