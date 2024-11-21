@@ -49,6 +49,7 @@
                         <th>Date</th>
                         <th>Time</th>
                         <th>Room</th>
+                        <th>Cancel</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,7 +66,7 @@
                 const scheduleTable = document.getElementById('scheduleTable');
                 const emptySchedule = document.getElementById('emptySchedule');
                 const tbody = scheduleTable.querySelector('tbody');
-
+    
                 if (data.length === 0) {
                     // Show message if schedule is empty
                     emptySchedule.style.display = 'block';
@@ -74,24 +75,83 @@
                     // Populate the table with schedule data
                     emptySchedule.style.display = 'none';
                     scheduleTable.style.display = 'table';
-
+    
                     data.forEach(presentation => {
+                        const startTime = presentation.start_time.slice(0, 5);
+                        const endTime = presentation.end_time.slice(0, 5);
+                                        
                         const row = document.createElement('tr');
-                        
+                        row.className = 'schedule-row'; // CSS třída pro formátování
+                                        
                         row.innerHTML = `
                             <td>${presentation.title}</td>
                             <td>${presentation.description}</td>
                             <td>${presentation.date}</td>
-                            <td>${presentation.start_time} - ${presentation.end_time}</td>
+                            <td>${startTime} - ${endTime}</td>
                             <td>${presentation.room_name}</td>
+                            <td style="text-align: center; vertical-align: middle;">
+                                <span 
+                                    class="cancel-icon" 
+                                    data-presentation-id="${presentation.presentation_id}" 
+                                    style="cursor: pointer; color: red;">&times;</span>
+                            </td>
                         `;
-
+                        
+                        // Přidání události pro odstranění
+                        const cancelIcon = row.querySelector('.cancel-icon');
+                        cancelIcon.addEventListener('click', () => {
+                            const presentationId = cancelIcon.getAttribute('data-presentation-id');
+                            console.log(`Removing presentation with ID: ${presentationId}`);
+                        
+                            if (presentationId && confirm(`Are you sure you want to remove "${presentation.title}" from your schedule?`)) {
+                                removeFromSchedule(presentationId, row);
+                            } else {
+                                console.error("Presentation ID is undefined or removal was cancelled.");
+                            }
+                        });
+                    
                         tbody.appendChild(row);
                     });
                 }
             })
-            .catch(error => console.error('Chyba při načítání rozvrhu:', error));
-    </script>
-
+            .catch(error => console.error('Error loading schedule:', error));
+    
+        // Function to remove presentation from schedule
+        function removeFromSchedule(presentationId, row) {
+            console.log(`Removing presentation with ID: ${presentationId}`); // Debugging
+            fetch('remove_from_schedule.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ presentation_id: presentationId })
+            })
+            .then(response => {
+                console.log('Response:', response); // Debugging
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Server response:', data); // Debugging
+                if (data.success) {
+                    row.remove();
+                
+                    // Check if the table is now empty
+                    const tbody = document.getElementById('scheduleTable').querySelector('tbody');
+                    if (tbody.children.length === 0) {
+                        document.getElementById('emptySchedule').style.display = 'block';
+                        document.getElementById('scheduleTable').style.display = 'none';
+                    }
+                } else {
+                    alert(`Failed to remove presentation from schedule: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error removing presentation:', error);
+            });
+        }
+    </script>       
 </body>
 </html>

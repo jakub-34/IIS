@@ -62,35 +62,35 @@ function setConferenceLink() {
 
 // Zavoláme funkci, aby se odkaz správně nastavil při načtení stránky
 setConferenceLink();
-
+let isLoggedIn = false;
 // Funkce pro kontrolu stavu přihlášení
 function checkLoginStatus() {
-    fetch('check_session.php')
-        .then(response => response.json())
-        .then(data => {
-            const loginLogoutButton = document.getElementById('loginLogoutButton');
-            const adminPageButton = document.getElementById('adminPageButton');
-            const conferenceButton = document.getElementById('create_presentation');
-
-
-            if (data.isLoggedIn) {
-                loginLogoutButton.textContent = 'Logout';
-                loginLogoutButton.href = 'logout.php';
-                conferenceButton.style.display = 'flex'
-                myScheduleButton.style.display = 'inline-block';
-
-                if (data.role === 'admin') {
-                    adminPageButton.style.display = 'inline-block';
+        fetch('check_session.php')
+            .then(response => response.json())
+            .then(data => {
+                const loginLogoutButton = document.getElementById('loginLogoutButton');
+                const adminPageButton = document.getElementById('adminPageButton');
+                const myScheduleButton = document.getElementById('myScheduleButton');
+                const conferenceButton = document.getElementById('create_presentation');
+    
+                if (data.isLoggedIn) {
+                    isLoggedIn = true; // Nastavíme stav přihlášení
+                    loginLogoutButton.textContent = 'Logout';
+                    loginLogoutButton.href = 'logout.php';
+                    myScheduleButton.style.display = 'inline-block';
+    
+                    if (data.role === 'admin') {
+                        adminPageButton.style.display = 'inline-block';
+                    }
+    
+                    conferenceButton.style.display = 'flex';
+                } else {
+                    loginLogoutButton.textContent = 'Login';
+                    loginLogoutButton.href = 'login.html';
                 }
-
-            } else {
-                loginLogoutButton.textContent = 'Login';
-                loginLogoutButton.href = 'login.html';
-            }
-        })
-        .catch(error => console.error('Chyba při kontrole přihlášení:', error));
-}
-
+            })
+            .catch(error => console.error('Chyba při kontrole přihlášení:', error));
+    }
 // Načtení stavu přihlášení po otevření stránky
 checkLoginStatus();
 
@@ -165,13 +165,70 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
                 </td>`;
             wrapperDiv.appendChild(row3);
 
-            const row4 = document.createElement('tr');
-            row4.innerHTML = `
-                <td colspan="2">
-                    <label for="checkbox-${count}">Add to schedule</label>
-                    <input type="checkbox" id="checkbox-${count}" name="conference-${count}" value="${conference.conference_id}">
-                </td>`;
-            wrapperDiv.appendChild(row4);
+            // Přidání checkboxu pouze pro přihlášené uživatele
+            if (isLoggedIn) {
+                // Zkontrolujeme, zda je prezentace již v rozvrhu
+                fetch(`check_schedule.php?presentation_id=${conference.presentation_id}`)
+                .then(response => response.json())
+                .then(scheduleData => {
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.style.position = 'absolute';
+                    checkbox.style.right = '10px'; // Zarovnání na pravou stranu uvnitř rámu
+                    checkbox.style.top = '50%'; // Vertikální zarovnání uprostřed
+                    checkbox.style.transform = 'translateY(-50%)';
+                    checkbox.title = 'Add to Schedule';
+
+                    // Nastavení výchozího stavu checkboxu podle odpovědi z backendu
+                    checkbox.checked = scheduleData.isInSchedule;
+                
+                    // Přidání checkboxu do wrapperDiv
+                    wrapperDiv.style.position = 'relative'; // Umožní pozicování checkboxu uvnitř
+                    wrapperDiv.appendChild(checkbox);
+                
+                    // Funkce pro přidání nebo odebrání prezentace z rozvrhu
+                    checkbox.addEventListener('change', () => {
+                        if (checkbox.checked) {
+                            // Přidání do rozvrhu
+                            fetch('add_to_schedule.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ presentation_id: conference.presentation_id })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (!data.success) {
+                                    alert('Failed to add to schedule.');
+                                    checkbox.checked = false; // Reset checkbox v případě chyby
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error adding to schedule:', error);
+                                checkbox.checked = false; // Reset checkbox v případě chyby
+                            });
+                        } else {
+                            // Odebrání z rozvrhu
+                            fetch('remove_from_schedule.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ presentation_id: conference.presentation_id })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (!data.success) {
+                                    alert('Failed to remove from schedule.');
+                                    checkbox.checked = true; // Reset checkbox v případě chyby
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error removing from schedule:', error);
+                                checkbox.checked = true; // Reset checkbox v případě chyby
+                            });
+                        }
+                    });
+                })
+                .catch(error => console.error('Error checking schedule:', error));
+            }
 
 
             containerDiv.appendChild(text);
