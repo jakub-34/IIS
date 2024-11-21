@@ -20,7 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['username'] = $username_db;
             $_SESSION['role'] = $role;
 
-            header("Location: index.html"); // Go to index.html
+            $previousPage = $_SERVER['HTTP_REFERER'] ?? 'index.html'; // Default to index.html if referer is not set
+            header("Location: $previousPage");
             exit;
         } else {
             echo "<script>alert('Wrong username or password.'); window.location.href='login.html';</script>";
