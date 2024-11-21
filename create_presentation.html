@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Návrh prezentaci</title>
+    <title>Add presentation</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -14,7 +14,7 @@
             <a href="index.html" style="text-decoration: none; color: inherit;">
                 <i class="fas fa-home" style="margin-right: 5px;"></i>
             </a>
-            Návrh prezentace
+            Add presentation
         </h2>
         <div style="float: right;">
             <!-- Tlačítko Login/Logout -->
@@ -25,12 +25,12 @@
     </div>
 
     <form id="presentationForm" class="form-container" method="POST" action="create_presentation.php">
-        <h2 style="color: black;">Návrh prezentace</h2>
+        <h2 style="color: black;">Add presentation</h2>
         <input type="hidden" name="conference_id" value="<?php echo isset($_GET['conference_id']) ? $_GET['conference_id'] : ''; ?>">
-        <input type="text" name="title" placeholder="Název" required>
-        <input type="url" name="photo-url" id="photo-url" placeholder="URL adresa fotky">
-        <textarea name="description" style="height: 100px;" placeholder="Popis" required></textarea>
-        <button type="submit" class="add-conference-button">Odeslat</button>
+        <input type="text" name="title" placeholder="Name" required>
+        <input type="url" name="photo-url" id="photo-url" placeholder="URL address of the photo">
+        <textarea name="description" style="height: 100px;" placeholder="Description" required></textarea>
+        <button type="submit" class="add-conference-button">Send</button>
     </form>
 
     <script>
@@ -51,7 +51,7 @@
             .then(response => response.text())  // Nebo response.json(), pokud vrací JSON
             .then(data => {
                 console.log(data);
-                alert('Prezentace byla odeslána!');
+                alert('Presentation was sent!');
                 const previousPage = sessionStorage.getItem('previousPage');
                 if (previousPage) {
                     window.location.href = previousPage; // Přejít zpět na původní stránku
@@ -59,7 +59,7 @@
                     window.location.href = 'conference_details.html'; // Pokud není uložena stránka, přejdeme na defaultní
                 }
             })
-            .catch(error => console.error('Chyba při odesílání formuláře:', error));
+            .catch(error => console.error('Error with sending data:', error));
         });
     </script>
 </body> 
