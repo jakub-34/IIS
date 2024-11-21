@@ -62,15 +62,17 @@ function checkLoginStatus() {
         })
         .catch(error => console.error('Chyba při kontrole přihlášení:', error));
 }
+
+//check status from registartion
 window.onload = function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const status = urlParams.get('status');
-            if (status === 'success') {
-                alert('Reservation made successfully!');
-            } else if (status === 'error') {
-                alert('Error creating reservation. Please try again.');
-            }
-        };
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+        if (status === 'success') {
+            alert('Reservation made successfully!');
+        } else if (status === 'error') {
+            alert('Error creating reservation. Please try again.');
+        }
+};
         
         
 // Načtení stavu přihlášení po otevření stránky

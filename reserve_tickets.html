@@ -31,6 +31,7 @@
             form.action = `reserve_tickets.php?conference_id=${conferenceId}`;
         });
 
+
     </script>
 
 
@@ -45,17 +46,36 @@
             <input type="number" id="tickets_count" name="tickets_count" required min="1" style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
             <label for="payment_status">Payment Status:</label>
             <select id="payment_status" name="payment_status" style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box;">
-                <option value="pending">pay on the spot</option>
                 <option value="paid">pay now</option>
+                <option value="pending">pay on the spot</option>
             </select>
             <div style="display: flex; justify-content: center; margin-top: 2vw;">
                 <button type="submit" class="login-button" style="width: 100%; max-width: 200px;">Proceed</button>
             </div>
         </form>
         <div style="text-align: center; margin-top: 0.5vw;">
-            <a href="register.html" style="font-size: 0.9em; text-decoration: none;">Register</a>
+            <a href="#" id="registerLink" style="font-size: 0.9em; text-decoration: none;">Register</a>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        const registerLink = document.getElementById('registerLink');
+
+        registerLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const lastname = document.getElementById('lastname').value;
+            if (name && lastname) {
+                registerLink.href = `register.html?name=${encodeURIComponent(name)}&lastname=${encodeURIComponent(lastname)}`;
+                window.location.href = registerLink.href;
+            } else {
+                registerLink.href = `register.html`;
+                window.location.href = registerLink.href;
+            }
+        });
+    });
+    </script>
 
 </body>
 </html>

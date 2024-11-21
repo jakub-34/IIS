@@ -27,6 +27,20 @@
                     // Redirect to the main page in case of an error
                     window.location.href = 'index.html';
                 });
+                
+                //fill in name and surname if redirected from ticket reservation
+                window.onload = function() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const name = urlParams.get('name');
+                    const lastname = urlParams.get('lastname');
+                    
+                    if (name) {
+                        document.getElementById('name').value = name;
+                    }
+                    if (lastname) {
+                        document.getElementById('lastname').value = lastname;
+                    }
+                };
         </script>
 </head>
 <body>
