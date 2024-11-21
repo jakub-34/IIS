@@ -12,22 +12,22 @@
             border: 2px solid red;
         }
     </style>
-        <script>
-            // Check if the user is logged in and has the admin role
-            fetch('check_session.php')
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.isLoggedIn) {
-                        // Redirect to the main page
-                        window.location.href = 'index.html';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking session:', error);
-                    // Redirect to the main page in case of an error
+    <script>
+        // Check if the user is logged in and has the admin role
+        fetch('check_session.php')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.isLoggedIn) {
+                    // Redirect to the main page
                     window.location.href = 'index.html';
-                });
-        </script>
+                }
+            })
+            .catch(error => {
+                console.error('Error checking session:', error);
+                // Redirect to the main page in case of an error
+                window.location.href = 'index.html';
+            });
+    </script>
 </head>
 <body>
 
@@ -35,10 +35,16 @@
         <h2 style="float: left;">
             <a href="index.html" style="text-decoration: none; color: inherit;">
                 <i class="fas fa-home" style="margin-right: 5px;"></i>
-                Konference
+                Conferences
             </a>
         </h2>
-        <a href="login.html" class="login-button">Login</a>
+        <div style="float: right;">
+            <!-- Tlačítko Login/Logout -->
+            <a href="login.html" id="loginLogoutButton" class="login-button">Login</a>
+            <a href="user_schedule.html" id="myScheduleButton" class="login-button" style="margin-right: 10px; display: none;">My Schedule</a>
+            <!-- Dynamické tlačítko Admin Page -->
+            <a href="admin_page.html" id="adminPageButton" class="login-button" style="display: none; margin-right: 10px;">Admin Page</a>
+        </div>
     </div>
 
     <div class="body">
@@ -73,6 +79,47 @@
             </div>
         </form>
     </div>
+
+    <script>
+    fetch('check_session.php')
+        .then(response => response.json())
+        .then(data => {
+            const loginLogoutButton = document.getElementById('loginLogoutButton');
+            const adminPageButton = document.getElementById('adminPageButton');
+            const conferenceButton = document.getElementById('create_conference');
+        
+            if (data.isLoggedIn) {
+                loginLogoutButton.textContent = 'Logout';
+                loginLogoutButton.href = 'logout.php';
+                conferenceButton.style.display = 'flex'
+            
+                if (data.role === 'admin') {
+                    adminPageButton.style.display = 'inline-block';
+                }
+            
+            } else {
+                loginLogoutButton.textContent = 'Login';
+                loginLogoutButton.href = 'login.html';
+            }
+        })
+        .catch(error => console.error('Chyba při kontrole přihlášení:', error));
+
+        // Check logged-in user role and display relevant buttons
+        fetch('check_session.php')
+            .then(response => response.json())
+            .then(data => {
+                const myScheduleButton = document.getElementById('myScheduleButton');
+                const adminPageButton = document.getElementById('adminPageButton');
+
+                if (data.isLoggedIn) {
+                    myScheduleButton.style.display = 'inline-block'; // Zobrazit tlačítko My Schedule
+                    if (data.role === 'admin') {
+                        adminPageButton.style.display = 'inline-block'; // Zobrazit tlačítko Admin Page
+                    }
+                }
+        })
+        .catch(error => console.error('Error checking session:', error));
+    </script>
 
 </body>
 </html>
