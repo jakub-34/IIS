@@ -14,7 +14,7 @@
             <a href="index.html" style="text-decoration: none; color: inherit;">
                 <i class="fas fa-home" style="margin-right: 5px;"></i>
             </a>
-            <a href="#">Presentations</a>
+            <a href="#">Conference Details</a>
             <a id="suggestionLink" href="#" style="opacity: 0.5; margin-left: 0.8vw; visibility: hidden;">Suggestions</a>
         </h2>
         <div style="float: right;">
@@ -36,6 +36,7 @@
     <a class="fixed-button" id="create_presentation" style="display: none;">
         <i class="fas fa-plus"></i>
     </a>
+
 
 <script>
 
@@ -115,6 +116,84 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
         var count = 1;
         const tableBody = document.getElementById('presentationTable');
 
+        const conferenceDetails = data.conference_details;
+        const capacityInfo = data.capacity_info;
+
+        const conferenceInfoContainer = document.createElement('div');
+        conferenceInfoContainer.style.display = 'flex'; 
+        conferenceInfoContainer.style.justifyContent = 'space-between';
+        conferenceInfoContainer.style.alignItems = 'flex-start';
+        conferenceInfoContainer.style.marginBottom = '20px';
+        conferenceInfoContainer.style.padding = '15px';
+        conferenceInfoContainer.style.border = '1px solid #ccc';
+        conferenceInfoContainer.style.borderRadius = '8px';
+        conferenceInfoContainer.style.backgroundColor = '#f9f9f9';
+        conferenceInfoContainer.style.position = 'relative';
+        conferenceInfoContainer.style.height = 'auto';
+
+        const leftColumnC = document.createElement('div');
+        leftColumnC.style.flex = '1'; 
+        leftColumnC.style.marginRight = '20px';
+
+        const title = document.createElement('h2');
+        title.textContent = conferenceDetails.name;
+        title.style.color = 'black';
+        title.style.marginBottom = '0px';
+
+        const description = document.createElement('p');
+        description.textContent = conferenceDetails.description;
+        description.style.marginBottom = '30px';
+        description.style.marginLeft = '20px';
+        description.style.marginTop = '0px';
+
+        const details = document.createElement('p');
+        details.innerHTML = `
+            <strong>Location:</strong> ${conferenceDetails.location}<br>
+            <strong>Date-time:</strong> ${new Date(conferenceDetails.start_datetime).toLocaleString('cs-CZ')} - 
+            ${new Date(conferenceDetails.end_datetime).toLocaleString('cs-CZ')}<br>
+            <strong>Capacity:</strong> ${capacityInfo.remaining_capacity}/${capacityInfo.total_capacity} <br>
+            <strong>Genre:</strong> ${conferenceDetails.genre}
+        `;
+        details.style.marginLeft = '20px';
+        details.style.bottom = '30px';
+
+        leftColumnC.appendChild(title);
+        leftColumnC.appendChild(description);
+        leftColumnC.appendChild(details);
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.position = 'absolute';
+        buttonContainer.style.bottom = '30px';
+        buttonContainer.style.right = '30px'; 
+
+        const reserveTicketButton = document.createElement('a');
+        reserveTicketButton.id = 'reserve_ticket_button';
+        reserveTicketButton.href = 'reserve_tickets.html';
+        reserveTicketButton.textContent = 'Reserve Ticket';
+        reserveTicketButton.style.display = 'inline-block';
+        reserveTicketButton.style.color = 'black';
+        reserveTicketButton.style.backgroundColor = '#fff';
+        reserveTicketButton.style.padding = '10px 20px';
+        reserveTicketButton.style.borderRadius = '5px';
+        reserveTicketButton.style.border = '2px solid #000';
+        reserveTicketButton.style.textDecoration = 'none';
+        reserveTicketButton.style.fontWeight = 'bold';
+
+        reserveTicketButton.addEventListener('mouseover', function() {
+            reserveTicketButton.style.backgroundColor = '#000';
+            reserveTicketButton.style.color = '#fff';
+        });
+        reserveTicketButton.addEventListener('mouseout', function() {
+            reserveTicketButton.style.backgroundColor = '#fff';
+            reserveTicketButton.style.color = '#000';
+        });
+
+        buttonContainer.appendChild(reserveTicketButton);
+        conferenceInfoContainer.appendChild(leftColumnC);
+        conferenceInfoContainer.appendChild(buttonContainer);
+        tableBody.appendChild(conferenceInfoContainer);
+
+
         // Hlavní obalovací div pro dva sloupce
         const mainContainer = document.createElement('div');
         mainContainer.style.display = 'flex';        
@@ -129,16 +208,12 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
         rightColumn.style.flex = '1';
 
         // Iterace přes data konferencí
-        data.forEach(conference => {
+        data.presentations.forEach(presentation => {
             const containerDiv = document.createElement('div');
             containerDiv.style.display = 'flex';
             containerDiv.style.alignItems = 'center';
             containerDiv.style.marginBottom = '10px';
             containerDiv.style.cursor = 'pointer';
-
-            /*containerDiv.onclick = () => {
-                window.location.href = `conference_details.html?id=${conference.conference_id}`;
-            };*/
 
             const text = document.createElement('p');
             text.innerHTML = `${count}`;
@@ -149,87 +224,79 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
             wrapperDiv.className = "conference";
 
             const row1 = document.createElement('tr');
-            row1.innerHTML = `<td colspan="2" style="font-weight: bold;">${conference.title}</td>`;
+            row1.innerHTML = `<td colspan="2" style="font-weight: bold;">${presentation.title}</td>`;
             row1.style.paddingBottom = '10vw';
             wrapperDiv.appendChild(row1);
 
             const row2 = document.createElement('tr');
-            //row2.innerHTML = `<td>${new Date(conference.start_datetime).toLocaleDateString()} - ${new Date(conference.end_datetime).toLocaleDateString()}</td><td>${new Date(conference.start_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>-<td>${new Date(conference.end_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>`;
-            row2.innerHTML = `<td colspan="2">${conference.description}</td>`;
+            row2.innerHTML = `<td colspan="2">${presentation.description}</td>`;
             wrapperDiv.appendChild(row2);
 
             const row3 = document.createElement('tr');
-            row3.innerHTML = `<td>${new Date(conference.date).toLocaleDateString('cs-CZ')}</td><td>
-                ${conference.start_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')} - 
-                ${conference.end_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')}
+            row3.innerHTML = `<td>${new Date(presentation.date).toLocaleDateString('cs-CZ')}</td><td>
+                ${presentation.start_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')} - 
+                ${presentation.end_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')}
                 </td>`;
             wrapperDiv.appendChild(row3);
 
             // Přidání checkboxu pouze pro přihlášené uživatele
             if (isLoggedIn) {
-                // Zkontrolujeme, zda je prezentace již v rozvrhu
-                fetch(`check_schedule.php?presentation_id=${conference.presentation_id}`)
+                fetch(`check_schedule.php?presentation_id=${presentation.presentation_id}`)
                 .then(response => response.json())
                 .then(scheduleData => {
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.style.position = 'absolute';
-                    checkbox.style.right = '10px'; // Zarovnání na pravou stranu uvnitř rámu
-                    checkbox.style.top = '50%'; // Vertikální zarovnání uprostřed
+                    checkbox.style.right = '10px';
+                    checkbox.style.top = '50%';
                     checkbox.style.transform = 'translateY(-50%)';
                     checkbox.title = 'Add to Schedule';
 
-                    // Nastavení výchozího stavu checkboxu podle odpovědi z backendu
                     checkbox.checked = scheduleData.isInSchedule;
-                
-                    // Přidání checkboxu do wrapperDiv
-                    wrapperDiv.style.position = 'relative'; // Umožní pozicování checkboxu uvnitř
+
+                    wrapperDiv.style.position = 'relative';
                     wrapperDiv.appendChild(checkbox);
-                
-                    // Funkce pro přidání nebo odebrání prezentace z rozvrhu
+
                     checkbox.addEventListener('change', () => {
                         if (checkbox.checked) {
-                            // Přidání do rozvrhu
                             fetch('add_to_schedule.php', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ presentation_id: conference.presentation_id })
+                                body: JSON.stringify({ presentation_id: presentation.presentation_id })
                             })
                             .then(response => response.json())
                             .then(data => {
                                 if (!data.success) {
                                     alert('Failed to add to schedule.');
-                                    checkbox.checked = false; // Reset checkbox v případě chyby
+                                    checkbox.checked = false;
                                 }
                             })
                             .catch(error => {
                                 console.error('Error adding to schedule:', error);
-                                checkbox.checked = false; // Reset checkbox v případě chyby
+                                checkbox.checked = false;
                             });
                         } else {
-                            // Odebrání z rozvrhu
                             fetch('remove_from_schedule.php', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ presentation_id: conference.presentation_id })
+                                body: JSON.stringify({ presentation_id: presentation.presentation_id })
                             })
                             .then(response => response.json())
                             .then(data => {
                                 if (!data.success) {
                                     alert('Failed to remove from schedule.');
-                                    checkbox.checked = true; // Reset checkbox v případě chyby
+                                    checkbox.checked = true;
                                 }
                             })
                             .catch(error => {
                                 console.error('Error removing from schedule:', error);
-                                checkbox.checked = true; // Reset checkbox v případě chyby
+                                checkbox.checked = true;
                             });
                         }
                     });
                 })
                 .catch(error => console.error('Error checking schedule:', error));
             }
-
 
             containerDiv.appendChild(text);
             containerDiv.appendChild(wrapperDiv);
