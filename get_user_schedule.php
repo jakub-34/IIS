@@ -2,15 +2,19 @@
 session_start();
 include 'db_config.php'; // Připojení k databázi
 
+// Zkontrolujte, zda je uživatel přihlášen
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode([]);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'User not logged in.']);
     exit;
 }
 
 $user_id = $_SESSION['user_id'];
 
+// Dotaz na databázi
 $query = "
-    SELECT 
+    SELECT
+        p.presentation_id, 
         p.title, 
         p.description, 
         p.date, 
@@ -24,13 +28,29 @@ $query = "
 ";
 
 $stmt = $conn->prepare($query);
+if (!$stmt) {
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'Database query preparation failed.']);
+    exit;
+}
+
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$result = $stmt->get_result();
+
+// Bind the result variables
+$stmt->bind_result($presentation_id, $title, $description, $date, $start_time, $end_time, $room_name);
 
 $schedule = [];
-while ($row = $result->fetch_assoc()) {
-    $schedule[] = $row;
+while ($stmt->fetch()) {
+    $schedule[] = [
+        'presentation_id' => $presentation_id,
+        'title' => $title,
+        'description' => $description,
+        'date' => $date,
+        'start_time' => $start_time,
+        'end_time' => $end_time,
+        'room_name' => $room_name,
+    ];
 }
 
 $stmt->close();
