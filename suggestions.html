@@ -32,10 +32,6 @@
             </tbody>
         </table>
     </div>
-    
-    <a class="fixed-button" id="create_presentation" style="display: none;">
-        <i class="fas fa-plus"></i>
-    </a>
 
 <script>
 
@@ -43,28 +39,13 @@
 if (sessionStorage.getItem('previousPage')) {
     document.getElementById('backLink').href = sessionStorage.getItem('previousPage');
 }
+sessionStorage.setItem('previousPage_forLogin', window.location.href);
 // Funkce pro získání ID konference z URL parametru
 function getConferenceId() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('id'); // Získá conference_id z URL, pokud existuje
 }
 
-// Funkce pro nastavení URL odkazu s conference_id
-function setConferenceLink() {
-    const conferenceId = getConferenceId(); // Získáme conference_id z URL
-    const createConferenceButton = document.getElementById('create_presentation');
-
-    // Zkontrolujme, zda bylo ID načteno a jestli máme tlačítko
-    console.log('id:', conferenceId);
-    console.log('createConferenceButton:', createConferenceButton);
-
-    if (conferenceId && createConferenceButton) {
-        createConferenceButton.href = `create_presentation.html?conference_id=${conferenceId}`;
-    } 
-}
-
-// Zavoláme funkci, aby se odkaz správně nastavil při načtení stránky
-setConferenceLink();
 
 // Funkce pro kontrolu stavu přihlášení
 function checkLoginStatus() {
@@ -73,12 +54,10 @@ function checkLoginStatus() {
         .then(data => {
             const loginLogoutButton = document.getElementById('loginLogoutButton');
             const adminPageButton = document.getElementById('adminPageButton');
-            const conferenceButton = document.getElementById('create_presentation');
 
             if (data.isLoggedIn) {
                 loginLogoutButton.textContent = 'Logout';
                 loginLogoutButton.href = 'logout.php';
-                conferenceButton.style.display = 'flex'
                 myScheduleButton.style.display = 'inline-block';
 
                 if (data.role === 'admin') {
@@ -95,11 +74,54 @@ function checkLoginStatus() {
 
 // Načtení stavu přihlášení po otevření stránky
 checkLoginStatus();
-sessionStorage.setItem('previousPage', window.location.href);
+
+function updatePresentationStatus(Id, status) {
+    fetch('update_presentation_status.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            presentation_id: Id,
+            status: status,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Status byl úspěšně aktualizován');
+        } else {
+            console.error('Chyba při aktualizaci stavu');
+        }
+    })
+    .catch(error => console.error('Chyba při komunikaci s serverem:', error));
+}
+
+function updatePresentation(data) {
+    fetch('update_presentation.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                console.log('Presentation updated successfully.');
+            } else {
+                console.error('Failed to update presentation:', result.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error updating presentation:', error);
+        });
+}
+
 
 // Načtení prezentací z PHP skriptu
 const conferenceId = getConferenceId();
-fetch(`conference_details.php?conference_id=${conferenceId}`)
+fetch(`get_suggestions.php?conference_id=${conferenceId}`)
     .then(response => response.json())
     .then(data => {
         var count = 1;
@@ -120,6 +142,7 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
 
         // Iterace přes data konferencí
         data.forEach(conference => {
+            const currentCount = count;
             const containerDiv = document.createElement('div');
             containerDiv.style.display = 'flex';
             containerDiv.style.alignItems = 'center';
@@ -148,12 +171,115 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
             row2.innerHTML = `<td colspan="2">${conference.description}</td>`;
             wrapperDiv.appendChild(row2);
 
+
             const row3 = document.createElement('tr');
-            row3.innerHTML = `<td>${new Date(conference.date).toLocaleDateString('cs-CZ')}</td><td>
-                ${conference.start_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')} - 
-    ${conference.end_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')}
-    </td>`;
+            row3.innerHTML = `
+                <td>
+                    <label for="date-${currentCount}">Date:</label>
+                    <input type="date" id="date-${currentCount}" name="date-${currentCount}" value="${conference.date ? new Date(conference.date).toISOString().split('T')[0] : ''}">
+                </td>
+            `;
             wrapperDiv.appendChild(row3);
+
+            const row4 = document.createElement('tr');
+            row4.innerHTML = `
+                <td>
+                    <label for="start_time-${currentCount}">Start Time:</label>
+                    <input type="time" id="start_time-${currentCount}" name="start_time-${currentCount}" value="${conference.start_time ? formatTime(conference.start_time) : ''}">
+                </td>
+                <td>
+                    <label for="end_time-${currentCount}">End Time:</label>
+                    <input type="time" id="end_time-${currentCount}" name="end_time-${currentCount}" value="${conference.end_time ? formatTime(conference.end_time) : ''}">
+                </td>
+            `;
+            wrapperDiv.appendChild(row4);
+            
+            function formatTime(timeString) {
+                if (!timeString) return '';
+
+                let date = new Date('1970-01-01T' + timeString + 'Z');
+                let hours = date.getUTCHours().toString().padStart(2, '0');
+                let minutes = date.getUTCMinutes().toString().padStart(2, '0');
+
+                return `${hours}:${minutes}`;
+            }
+            
+            const row5 = document.createElement('tr');
+            row5.innerHTML = `
+                <td>
+                    <label>Room:</label>
+                    <input type="text" id="room-${currentCount}" value="${conference.room_name || ''}">
+                </td>
+            `;
+            wrapperDiv.appendChild(row5);
+
+
+
+
+            const row6 = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 2;
+
+            // Vytvoření checkboxu
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `checkbox-${count}`;
+            checkbox.name = `conference-${count}`;
+            checkbox.value = conference.presentation_id;
+            
+            // Pokud je status "approved", checkbox bude zaškrtnutý
+            checkbox.checked = (conference.status === 'approved');
+
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    // Při zaškrtnutí checkboxu validujeme povinné vstupy
+                    const dateInput = document.getElementById(`date-${currentCount}`);
+                    const startTimeInput = document.getElementById(`start_time-${currentCount}`);
+                    const endTimeInput = document.getElementById(`end_time-${currentCount}`);
+                    const roomInput = document.getElementById(`room-${currentCount}`);
+                    
+                    console.log(currentCount);
+                    /*if (!dateInput || !startTimeInput || !endTimeInput || !roomInput) {
+                        alert('Required inputs are missing from the DOM.');
+                        checkbox.checked = false;
+                        return;
+                    }*/
+
+                    // Kontrola, zda jsou všechna povinná pole vyplněná
+                    if (!dateInput.value || !startTimeInput.value || !endTimeInput.value || !roomInput.value) {
+                        alert('Please fill in all required fields before adding to the conference.');
+                        checkbox.checked = false; // Vrátí checkbox do nezaškrtnutého stavu
+                        return;
+                    }
+                    else
+                    {
+                        const data = {
+                            presentation_id: conference.presentation_id,
+                            date: dateInput.value,
+                            start_time: startTimeInput.value,
+                            end_time: endTimeInput.value,
+                            room: roomInput.value,
+                            status: 'approved'
+                        };
+                        updatePresentation(data);
+                    }
+                }
+                else{
+                    updatePresentationStatus(conference.presentation_id, checkbox.checked ? 'approved' : 'not_approved')
+                }
+            });
+            
+
+            // Vytvoření labelu pro checkbox
+            const label = document.createElement('label');
+            label.setAttribute('for', checkbox.id);
+            label.textContent = 'Add to conference';
+
+            // Připojení labelu a checkboxu do tabulky
+            td.appendChild(label);
+            td.appendChild(checkbox);
+            row6.appendChild(td);
+            wrapperDiv.appendChild(row6);
 
 
             containerDiv.appendChild(text);
@@ -171,8 +297,11 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
         mainContainer.appendChild(leftColumn);
         mainContainer.appendChild(rightColumn);
         tableBody.appendChild(mainContainer);
+         // Po načtení konferencí načteme místnosti
 
     })
+
+
 /*fetch(`conference_details.php?conference_id=${conferenceId}`)
     .then(response => response.json())
     .then(data => {

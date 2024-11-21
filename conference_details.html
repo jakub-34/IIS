@@ -10,12 +10,12 @@
 <body>
 
     <div class="header-container">
-        <h2 style="float: left;">
+        <h2 id="header" style="float: left;">
             <a href="index.html" style="text-decoration: none; color: inherit;">
                 <i class="fas fa-home" style="margin-right: 5px;"></i>
             </a>
             <a href="#">Presentations</a>
-            <a href="suggestions.html" style="opacity: 0.5; margin-left: 0.8vw;">Suggestions</a>
+            <a id="suggestionLink" href="#" style="opacity: 0.5; margin-left: 0.8vw; visibility: hidden;">Suggestions</a>
         </h2>
         <div style="float: right;">
             <!-- Tlačítko Login/Logout -->
@@ -38,6 +38,8 @@
     </a>
 
 <script>
+
+sessionStorage.setItem('previousPage', window.location.href);
 // Funkce pro získání ID konference z URL parametru
 function getConferenceId() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -70,6 +72,7 @@ function checkLoginStatus() {
             const adminPageButton = document.getElementById('adminPageButton');
             const conferenceButton = document.getElementById('create_presentation');
 
+
             if (data.isLoggedIn) {
                 loginLogoutButton.textContent = 'Logout';
                 loginLogoutButton.href = 'logout.php';
@@ -90,10 +93,22 @@ function checkLoginStatus() {
 
 // Načtení stavu přihlášení po otevření stránky
 checkLoginStatus();
-sessionStorage.setItem('previousPage', window.location.href);
+
+const conferenceId = getConferenceId();
+function loadUserData() {
+    fetch(`get_conference_data.php?id=${conferenceId}`)
+    .then(response => response.json())
+    .then(data => {
+        const suggestionLink = document.getElementById('suggestionLink');
+        if (data.userId == data.organizerId){
+            suggestionLink.style.visibility = 'visible';
+            suggestionLink.href = `suggestions.html?id=${conferenceId}`;
+        }
+    })
+}
+loadUserData();
 
 // Načtení prezentací z PHP skriptu
-const conferenceId = getConferenceId();
 fetch(`conference_details.php?conference_id=${conferenceId}`)
     .then(response => response.json())
     .then(data => {
