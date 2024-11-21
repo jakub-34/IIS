@@ -36,211 +36,191 @@
     <a class="fixed-button" id="create_presentation" style="display: none;">
         <i class="fas fa-plus"></i>
     </a>
-
 <script>
-// Funkce pro získání ID konference z URL parametru
-function getConferenceId() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('id'); // Získá conference_id z URL, pokud existuje
-}
-
-// Funkce pro nastavení URL odkazu s conference_id
-function setConferenceLink() {
-    const conferenceId = getConferenceId(); // Získáme conference_id z URL
-    const createConferenceButton = document.getElementById('create_presentation');
-
-    // Zkontrolujme, zda bylo ID načteno a jestli máme tlačítko
-    console.log('id:', conferenceId);
-    console.log('createConferenceButton:', createConferenceButton);
-
-    if (conferenceId && createConferenceButton) {
-        createConferenceButton.href = `create_presentation.html?conference_id=${conferenceId}`;
-    } 
-}
-
-// Zavoláme funkci, aby se odkaz správně nastavil při načtení stránky
-setConferenceLink();
-
-// Funkce pro kontrolu stavu přihlášení
-function checkLoginStatus() {
-    fetch('check_session.php')
+    // Funkce pro získání ID konference z URL parametru
+    function getConferenceId() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('id'); // Získá conference_id z URL, pokud existuje
+    }
+    
+    // Funkce pro nastavení URL odkazu s conference_id
+    function setConferenceLink() {
+        const conferenceId = getConferenceId(); // Získáme conference_id z URL
+        const createConferenceButton = document.getElementById('create_presentation');
+    
+        if (conferenceId && createConferenceButton) {
+            createConferenceButton.href = `create_presentation.html?conference_id=${conferenceId}`;
+        } 
+    }
+    
+    setConferenceLink();
+    
+    // Funkce pro kontrolu stavu přihlášení
+    let isLoggedIn = false;
+    
+    function checkLoginStatus() {
+        fetch('check_session.php')
+            .then(response => response.json())
+            .then(data => {
+                const loginLogoutButton = document.getElementById('loginLogoutButton');
+                const adminPageButton = document.getElementById('adminPageButton');
+                const myScheduleButton = document.getElementById('myScheduleButton');
+                const conferenceButton = document.getElementById('create_presentation');
+    
+                if (data.isLoggedIn) {
+                    isLoggedIn = true; // Nastavíme stav přihlášení
+                    loginLogoutButton.textContent = 'Logout';
+                    loginLogoutButton.href = 'logout.php';
+                    myScheduleButton.style.display = 'inline-block';
+    
+                    if (data.role === 'admin') {
+                        adminPageButton.style.display = 'inline-block';
+                    }
+    
+                    conferenceButton.style.display = 'flex';
+                } else {
+                    loginLogoutButton.textContent = 'Login';
+                    loginLogoutButton.href = 'login.html';
+                }
+            })
+            .catch(error => console.error('Chyba při kontrole přihlášení:', error));
+    }
+    
+    checkLoginStatus();
+    sessionStorage.setItem('previousPage', window.location.href);
+    
+    // Načtení prezentací z PHP skriptu
+    const conferenceId = getConferenceId();
+    fetch(`conference_details.php?conference_id=${conferenceId}`)
         .then(response => response.json())
         .then(data => {
-            const loginLogoutButton = document.getElementById('loginLogoutButton');
-            const adminPageButton = document.getElementById('adminPageButton');
-            const conferenceButton = document.getElementById('create_presentation');
+            const tableBody = document.getElementById('presentationTable');
+    
+            const mainContainer = document.createElement('div');
+            mainContainer.style.display = 'flex';        
+            mainContainer.style.justifyContent = 'space-between';
+            mainContainer.style.gap = '20px';            
+    
+            const leftColumn = document.createElement('div');
+            leftColumn.style.flex = '1';
+    
+            const rightColumn = document.createElement('div');
+            rightColumn.style.flex = '1';
+    
+            data.forEach((conference, index) => {
+                const containerDiv = document.createElement('div');
+                containerDiv.style.display = 'flex';
+                containerDiv.style.alignItems = 'center';
+                containerDiv.style.marginBottom = '10px';
+                containerDiv.style.position = 'relative';
+    
+                const text = document.createElement('p');
+                text.innerHTML = `${index + 1}`;
+                text.style.marginRight = '10px';
+                text.style.fontWeight = 'bold';
+    
+                const wrapperDiv = document.createElement('div');
+                wrapperDiv.className = "conference";
+    
+                const row1 = document.createElement('tr');
+                row1.innerHTML = `<td colspan="2" style="font-weight: bold;">${conference.title}</td>`;
+                row1.style.paddingBottom = '10vw';
+                wrapperDiv.appendChild(row1);
+    
+                const row2 = document.createElement('tr');
+                row2.innerHTML = `<td colspan="2">${conference.description}</td>`;
+                wrapperDiv.appendChild(row2);
+    
+                const row3 = document.createElement('tr');
+                row3.innerHTML = `<td>${new Date(conference.date).toLocaleDateString('cs-CZ')}</td><td>
+                    ${conference.start_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')} - 
+                    ${conference.end_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')}
+                    </td>`;
+                wrapperDiv.appendChild(row3);
+    
+                // Přidání checkboxu pouze pro přihlášené uživatele
+                if (isLoggedIn) {
+                    // Zkontrolujeme, zda je prezentace již v rozvrhu
+                    fetch(`check_schedule.php?presentation_id=${conference.presentation_id}`)
+                    .then(response => response.json())
+                    .then(scheduleData => {
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.style.position = 'absolute';
+                        checkbox.style.right = '10px'; // Zarovnání na pravou stranu uvnitř rámu
+                        checkbox.style.top = '50%'; // Vertikální zarovnání uprostřed
+                        checkbox.style.transform = 'translateY(-50%)';
+                        checkbox.title = 'Add to Schedule';
 
-            if (data.isLoggedIn) {
-                loginLogoutButton.textContent = 'Logout';
-                loginLogoutButton.href = 'logout.php';
-                conferenceButton.style.display = 'flex'
-                myScheduleButton.style.display = 'inline-block';
-
-                if (data.role === 'admin') {
-                    adminPageButton.style.display = 'inline-block';
+                        // Nastavení výchozího stavu checkboxu podle odpovědi z backendu
+                        checkbox.checked = scheduleData.isInSchedule;
+                    
+                        // Přidání checkboxu do wrapperDiv
+                        wrapperDiv.style.position = 'relative'; // Umožní pozicování checkboxu uvnitř
+                        wrapperDiv.appendChild(checkbox);
+                    
+                        // Funkce pro přidání nebo odebrání prezentace z rozvrhu
+                        checkbox.addEventListener('change', () => {
+                            if (checkbox.checked) {
+                                // Přidání do rozvrhu
+                                fetch('add_to_schedule.php', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ presentation_id: conference.presentation_id })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (!data.success) {
+                                        alert('Failed to add to schedule.');
+                                        checkbox.checked = false; // Reset checkbox v případě chyby
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error adding to schedule:', error);
+                                    checkbox.checked = false; // Reset checkbox v případě chyby
+                                });
+                            } else {
+                                // Odebrání z rozvrhu
+                                fetch('remove_from_schedule.php', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ presentation_id: conference.presentation_id })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (!data.success) {
+                                        alert('Failed to remove from schedule.');
+                                        checkbox.checked = true; // Reset checkbox v případě chyby
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error removing from schedule:', error);
+                                    checkbox.checked = true; // Reset checkbox v případě chyby
+                                });
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Error checking schedule:', error));
                 }
-
-            } else {
-                loginLogoutButton.textContent = 'Login';
-                loginLogoutButton.href = 'login.html';
-            }
+    
+                containerDiv.appendChild(text);
+                containerDiv.appendChild(wrapperDiv);
+    
+                if ((index + 1) % 2 !== 0) {
+                    leftColumn.appendChild(containerDiv);
+                } else {
+                    rightColumn.appendChild(containerDiv);
+                }
+            });
+    
+            mainContainer.appendChild(leftColumn);
+            mainContainer.appendChild(rightColumn);
+            tableBody.appendChild(mainContainer);
+    
         })
-        .catch(error => console.error('Chyba při kontrole přihlášení:', error));
-}
-
-// Načtení stavu přihlášení po otevření stránky
-checkLoginStatus();
-sessionStorage.setItem('previousPage', window.location.href);
-
-// Načtení prezentací z PHP skriptu
-const conferenceId = getConferenceId();
-fetch(`conference_details.php?conference_id=${conferenceId}`)
-    .then(response => response.json())
-    .then(data => {
-        var count = 1;
-        const tableBody = document.getElementById('presentationTable');
-
-        // Hlavní obalovací div pro dva sloupce
-        const mainContainer = document.createElement('div');
-        mainContainer.style.display = 'flex';        
-        mainContainer.style.justifyContent = 'space-between';
-        mainContainer.style.gap = '20px';            
-
-        // Levý a pravý sloupec
-        const leftColumn = document.createElement('div');
-        leftColumn.style.flex = '1';
-
-        const rightColumn = document.createElement('div');
-        rightColumn.style.flex = '1';
-
-        // Iterace přes data konferencí
-        data.forEach(conference => {
-            const containerDiv = document.createElement('div');
-            containerDiv.style.display = 'flex';
-            containerDiv.style.alignItems = 'center';
-            containerDiv.style.marginBottom = '10px';
-            containerDiv.style.cursor = 'pointer';
-
-            /*containerDiv.onclick = () => {
-                window.location.href = `conference_details.html?id=${conference.conference_id}`;
-            };*/
-
-            const text = document.createElement('p');
-            text.innerHTML = `${count}`;
-            text.style.marginRight = '10px';
-            text.style.fontWeight = 'bold';
-
-            const wrapperDiv = document.createElement('div');
-            wrapperDiv.className = "conference";
-
-            const row1 = document.createElement('tr');
-            row1.innerHTML = `<td colspan="2" style="font-weight: bold;">${conference.title}</td>`;
-            row1.style.paddingBottom = '10vw';
-            wrapperDiv.appendChild(row1);
-
-            const row2 = document.createElement('tr');
-            //row2.innerHTML = `<td>${new Date(conference.start_datetime).toLocaleDateString()} - ${new Date(conference.end_datetime).toLocaleDateString()}</td><td>${new Date(conference.start_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>-<td>${new Date(conference.end_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>`;
-            row2.innerHTML = `<td colspan="2">${conference.description}</td>`;
-            wrapperDiv.appendChild(row2);
-
-            const row3 = document.createElement('tr');
-            row3.innerHTML = `<td>${new Date(conference.date).toLocaleDateString('cs-CZ')}</td><td>
-                ${conference.start_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')} - 
-                ${conference.end_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')}
-                </td>`;
-            wrapperDiv.appendChild(row3);
-
-            const row4 = document.createElement('tr');
-            row4.innerHTML = `
-                <td colspan="2">
-                    <label for="checkbox-${count}">Add to schedule</label>
-                    <input type="checkbox" id="checkbox-${count}" name="conference-${count}" value="${conference.conference_id}">
-                </td>`;
-            wrapperDiv.appendChild(row4);
-
-
-            containerDiv.appendChild(text);
-            containerDiv.appendChild(wrapperDiv);
-
-            if (count % 2 !== 0) {
-                leftColumn.appendChild(containerDiv);
-            } else {
-                rightColumn.appendChild(containerDiv);
-            }
-
-            count++;
-        });
-
-        mainContainer.appendChild(leftColumn);
-        mainContainer.appendChild(rightColumn);
-        tableBody.appendChild(mainContainer);
-
-    })
-/*fetch(`conference_details.php?conference_id=${conferenceId}`)
-    .then(response => response.json())
-    .then(data => {
-        var count = 1;
-        const tableBody = document.getElementById('presentationTable');
-
-        // Hlavní obalovací div pro dva sloupce
-        const mainContainer = document.createElement('div');
-        mainContainer.style.display = 'flex';        
-        mainContainer.style.justifyContent = 'space-between';
-        mainContainer.style.gap = '20px';            
-
-
-        // Levý a pravý sloupec
-        const leftColumn = document.createElement('div');
-        leftColumn.style.flex = '1';
-
-        const rightColumn = document.createElement('div');
-        rightColumn.style.flex = '1';
-
-        // Iterace přes data prezentací
-        data.forEach(presentation => {
-            const containerDiv = document.createElement('div');
-            containerDiv.style.display = 'flex';
-            containerDiv.style.alignItems = 'center';
-            containerDiv.style.marginBottom = '10px';
-            containerDiv.style.cursor = 'pointer';
-
-            const text = document.createElement('p');
-            text.innerHTML = `${count}`;
-            text.style.marginRight = '10px';
-            text.style.fontWeight = 'bold';
-
-            const wrapperDiv = document.createElement('div');
-            wrapperDiv.className = "presentation";
-
-            // Prezentace - řádky
-            const row1 = document.createElement('tr');
-            row1.innerHTML = `<td colspan="2" style="font-weight: bold;">${presentation.title}</td>`;
-            row1.style.paddingBottom = '10vw';
-            wrapperDiv.appendChild(row1);
-
-            const row2 = document.createElement('tr');
-            row2.innerHTML = `<td>${new Date(presentation.start_time).toLocaleDateString()} - ${new Date(presentation.end_time).toLocaleDateString()}</td><td>${new Date(presentation.start_time).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>-<td>${new Date(presentation.end_time).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>`;
-            wrapperDiv.appendChild(row2);
-
-            containerDiv.appendChild(text);
-            containerDiv.appendChild(wrapperDiv);
-
-            if (count % 2 !== 0) {
-                leftColumn.appendChild(containerDiv);
-            } else {
-                rightColumn.appendChild(containerDiv);
-            }
-
-            count++;
-        });
-
-        mainContainer.appendChild(leftColumn);
-        mainContainer.appendChild(rightColumn);
-        tableBody.appendChild(mainContainer);
-        //tableBody.appendChild(mainContainer);
-
-    });*/
-</script>
+        .catch(error => console.error('Chyba při načítání prezentací:', error));
+    </script>
+    
 
 </body>
 </html>
