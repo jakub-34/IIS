@@ -192,7 +192,10 @@ h2 a
 }
 
 .schedule-row td {
-    padding: 10px;
+    padding-left: 1vw;
+    padding-right: 1vw;
+    padding-top: 10px;
+    padding-bottom: 10px;
     border: none;
     text-align: left;
     vertical-align: middle;

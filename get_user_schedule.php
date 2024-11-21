@@ -19,11 +19,10 @@ $query = "
         p.description, 
         p.date, 
         p.start_time, 
-        p.end_time, 
-        r.name AS room_name
+        p.end_time,
+        p.room_name
     FROM user_presentation up
     JOIN presentations p ON up.presentation_id = p.presentation_id
-    JOIN rooms r ON p.room_id = r.room_id
     WHERE up.user_id = ?
 ";
 
