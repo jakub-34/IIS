@@ -24,6 +24,7 @@ $query = "
     FROM user_presentation up
     JOIN presentations p ON up.presentation_id = p.presentation_id
     WHERE up.user_id = ?
+    ORDER BY p.date ASC, p.start_time ASC
 ";
 
 $stmt = $conn->prepare($query);
