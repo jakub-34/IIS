@@ -219,3 +219,41 @@ h2 a
 .cancel-icon:hover {
     color: darkred;
 }
+
+/* Search bar styling */
+#searchBar {
+    width: calc(100% - 22px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* Reservation list styling */
+#reservationList {
+    list-style: none;
+    padding: 0;
+}
+
+#reservationList li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+/* Confirm Payment Button styling */
+#reservationList li button {
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+}
