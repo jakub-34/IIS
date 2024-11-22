@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db_config.php'; // Include your database configuration
+include 'db_config.php';
 
 if (!isset($_GET['conference_id']) || !isset($_GET['status'])) {
     echo json_encode([]);
@@ -10,9 +10,9 @@ if (!isset($_GET['conference_id']) || !isset($_GET['status'])) {
 $conference_id = intval($_GET['conference_id']);
 $status = $_GET['status'];
 
-// Query to get pending reservations with user details
+// Query to get pending reservations with user details and reservation_id
 $query = "
-    SELECT u.name, u.lastname
+    SELECT r.reservation_id, u.name, u.lastname
     FROM reservations r
     JOIN users u ON r.user_id = u.user_id
     WHERE r.conference_id = ? AND r.status = ?
@@ -28,12 +28,13 @@ if ($stmt === false) {
 $stmt->bind_param("is", $conference_id, $status);
 $stmt->execute();
 
-// Use bind_result instead of get_result
-$stmt->bind_result($name, $lastname);
+// Use bind_result to fetch the necessary data
+$stmt->bind_result($reservation_id, $name, $lastname);
 
 $reservations = [];
 while ($stmt->fetch()) {
     $reservations[] = [
+        'reservation_id' => $reservation_id,
         'name' => $name,
         'lastname' => $lastname
     ];

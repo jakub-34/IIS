@@ -28,7 +28,7 @@
     
     <div class="body">
         <div style="margin-bottom: 20px;">
-            <input type="text" id="searchBar" placeholder="Search by lastname..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;">
+            <input type="text" id="searchBar" placeholder="Search by last name..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;">
         </div>
         <ul id="reservationList" style="list-style: none; padding: 0;">
             <!-- Reservations will be dynamically populated here -->
@@ -45,6 +45,7 @@
         // Set the correct `id` for the links
         function updateLinks() {
             const id = getConferenceId();
+
             if (id) {
                 document.getElementById('conferenceDetailsLink').href = `conference_details.html?id=${id}`;
                 document.getElementById('suggestionsLink').href = `suggestions.html?id=${id}`;
@@ -52,30 +53,53 @@
         }
 
         // Fetch reservations and populate the list
-        function fetchReservations() {
-            const conferenceId = getConferenceId();
-            const status = "pending";
+    function fetchReservations() {
+        const conferenceId = getConferenceId();
+        const status = "pending";
 
-            fetch(`get_reservations.php?conference_id=${conferenceId}&status=${status}`)
-                .then(response => response.json())
-                .then(data => {
-                    const reservationList = document.getElementById('reservationList');
-                    reservationList.innerHTML = ''; // Clear the list
+        fetch(`get_reservations.php?conference_id=${conferenceId}&status=${status}`)
+            .then(response => response.json())
+            .then(data => {
+                const reservationList = document.getElementById('reservationList');
+                reservationList.innerHTML = ''; // Clear the list
 
-                    data.forEach(reservation => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `${reservation.name} ${reservation.lastname}`;
-                        listItem.dataset.lastname = reservation.lastname.toLowerCase(); // Store lowercase last name for searching
-                        listItem.style.padding = '10px';
-                        listItem.style.border = '1px solid #ccc';
-                        listItem.style.borderRadius = '5px';
-                        listItem.style.marginBottom = '10px';
-                        listItem.style.backgroundColor = '#f9f9f9';
-                        reservationList.appendChild(listItem);
+                data.forEach(reservation => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${reservation.name} ${reservation.lastname}`;
+                    listItem.dataset.lastname = reservation.lastname.toLowerCase(); // Store lowercase last name for searching
+                    listItem.dataset.reservationId = reservation.reservation_id;
+                    listItem.style.display = 'flex';
+                    listItem.style.alignItems = 'center';
+                    listItem.style.justifyContent = 'space-between';
+                    listItem.style.padding = '10px';
+                    listItem.style.border = '1px solid #ccc';
+                    listItem.style.borderRadius = '5px';
+                    listItem.style.marginBottom = '10px';
+                    listItem.style.backgroundColor = '#f9f9f9';
+
+                    // Confirm Payment Button
+                    const confirmButton = document.createElement('button');
+                    confirmButton.textContent = 'Confirm Payment';
+                    confirmButton.style.padding = '5px 10px';
+                    confirmButton.style.backgroundColor = '#4CAF50';
+                    confirmButton.style.color = 'white';
+                    confirmButton.style.border = 'none';
+                    confirmButton.style.borderRadius = '3px';
+                    confirmButton.style.cursor = 'pointer';
+                    confirmButton.style.fontSize = '14px';
+
+                    confirmButton.addEventListener('click', () => {
+                        const reservationId = reservation.reservation_id;
+                        confirmPayment(reservationId, listItem);
                     });
-                })
-                .catch(error => console.error('Error fetching reservations:', error));
-        }
+
+                    listItem.appendChild(confirmButton);
+                    reservationList.appendChild(listItem);
+                });
+            })
+        .catch(error => console.error('Error fetching reservations:', error));
+    }
+
 
         // Filter reservations based on the search bar
         function filterReservations() {
@@ -85,11 +109,38 @@
             reservations.forEach(item => {
                 const lastname = item.dataset.lastname;
                 if (lastname.includes(searchQuery)) {
-                    item.style.display = '';
+                    item.style.display = 'flex';
                 } else {
                     item.style.display = 'none';
                 }
             });
+        }
+
+        // Confirm payment and update the status in the database
+        function confirmPayment(reservationId, listItem) {
+            fetch('confirm_payment.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reservation_id: reservationId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        listItem.remove(); // Remove the item from the list after confirmation
+                        console.log('Payment confirmed for reservation ID:', reservationId);
+
+                        // Check if the list is now empty
+                        const reservationList = document.getElementById('reservationList');
+                        if (reservationList.children.length === 0) {
+                            alert('All pending reservations have been processed.');
+                        }
+                    } else {
+                        alert('Failed to confirm payment: ' + data.error);
+                    }
+                })
+                .catch(error => console.error('Error confirming payment:', error));
         }
 
         // Attach event listener to the search bar
