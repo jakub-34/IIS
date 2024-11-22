@@ -137,6 +137,7 @@ fetch(`get_suggestions.php?conference_id=${conferenceId}`)
     .then(response => response.json())
     .then(data => {
         var count = 1;
+        const statusInput = [];
         const tableBody = document.getElementById('presentationTable');
 
         // Hlavní obalovací div pro dva sloupce
@@ -250,7 +251,8 @@ fetch(`get_suggestions.php?conference_id=${conferenceId}`)
             checkbox.value = conference.presentation_id;
             
             // Pokud je status "approved", checkbox bude zaškrtnutý
-            checkbox.checked = (conference.status === 'approved');
+            checkbox.checked = (conference.status == 'approved');
+            statusInput[currentCount] = conference.status;
 
             checkbox.addEventListener('change', () => {
                 if (checkbox.checked) {
@@ -289,7 +291,7 @@ fetch(`get_suggestions.php?conference_id=${conferenceId}`)
                     //else
                     //{
                     for (let i = 1; i < count; i++) {
-                        if (i != currentCount)
+                        if (i != currentCount && statusInput[i] == 'approved')
                         {
                             const date = document.getElementById(`date-${i}`);
                             const room = document.getElementById(`room-${i}`);
@@ -324,10 +326,12 @@ fetch(`get_suggestions.php?conference_id=${conferenceId}`)
                             room: roomInput.value,
                             status: 'approved'
                         };
+                        statusInput[currentCount] = 'approved';
                         updatePresentation(data);
                     //}
                 }
                 else{
+                    statusInput[currentCount] = 'not_approved';
                     updatePresentationStatus(conference.presentation_id, checkbox.checked ? 'approved' : 'not_approved')
                 }
             });
