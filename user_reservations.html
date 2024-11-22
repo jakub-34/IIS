@@ -141,8 +141,11 @@
             .then(data => {
                 if (data.success) {
                     loadReservations(); 
+                } else {
+                    alert(data.error || 'Failed to update ticket count.');
+                    loadReservations();
                 }
-            })
+            });
         }
 
         // Function to remove a reservation
