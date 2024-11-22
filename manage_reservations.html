@@ -62,7 +62,6 @@
                     const myReservationButton = document.getElementById('myReservationButton');
                 
                     if (data.isLoggedIn) {
-                        isLoggedIn = true; // Nastavíme stav přihlášení
                         loginLogoutButton.textContent = 'Logout';
                         loginLogoutButton.href = 'logout.php';
                         myScheduleButton.style.display = 'inline-block';
@@ -77,7 +76,7 @@
                         loginLogoutButton.href = 'login.html';
                     }
                 })
-            .catch(error => console.error('Chyba při kontrole přihlášení:', error));
+            .catch(error => console.error('Error checking login status:', error));
         }
 
         // Extract the current `id` parameter from the URL
@@ -97,38 +96,37 @@
         }
 
         // Fetch reservations and populate the list
-    function fetchReservations() {
-        const conferenceId = getConferenceId();
-        const status = "pending";
+        function fetchReservations() {
+            const conferenceId = getConferenceId();
+            const status = "pending";
 
-        fetch(`get_reservations.php?conference_id=${conferenceId}&status=${status}`)
-            .then(response => response.json())
-            .then(data => {
-                const reservationList = document.getElementById('reservationList');
-                reservationList.innerHTML = ''; // Clear the list
+            fetch(`get_reservations.php?conference_id=${conferenceId}&status=${status}`)
+                .then(response => response.json())
+                .then(data => {
+                    const reservationList = document.getElementById('reservationList');
+                    reservationList.innerHTML = ''; // Clear the list
 
-                data.forEach(reservation => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `${reservation.name} ${reservation.lastname}`;
-                    listItem.dataset.lastname = reservation.lastname.toLowerCase(); // Store lowercase last name for searching
-                    listItem.dataset.reservationId = reservation.reservation_id;
+                    data.forEach(reservation => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${reservation.name} ${reservation.lastname} (${reservation.tickets_count} tickets)`;
+                        listItem.dataset.lastname = reservation.lastname.toLowerCase(); // Store lowercase last name for searching
+                        listItem.dataset.reservationId = reservation.reservation_id;
 
-                    // Confirm Payment Button
-                    const confirmButton = document.createElement('button');
-                    confirmButton.textContent = 'Confirm Payment';
+                        // Confirm Payment Button
+                        const confirmButton = document.createElement('button');
+                        confirmButton.textContent = 'Confirm Payment';
 
-                    confirmButton.addEventListener('click', () => {
-                        const reservationId = reservation.reservation_id;
-                        confirmPayment(reservationId, listItem);
+                        confirmButton.addEventListener('click', () => {
+                            const reservationId = reservation.reservation_id;
+                            confirmPayment(reservationId, listItem);
+                        });
+
+                        listItem.appendChild(confirmButton);
+                        reservationList.appendChild(listItem);
                     });
-
-                    listItem.appendChild(confirmButton);
-                    reservationList.appendChild(listItem);
-                });
-            })
-        .catch(error => console.error('Error fetching reservations:', error));
-    }
-
+                })
+            .catch(error => console.error('Error fetching reservations:', error));
+        }
 
         // Filter reservations based on the search bar
         function filterReservations() {
