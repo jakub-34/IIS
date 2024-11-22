@@ -100,7 +100,6 @@ function checkLoginStatus() {
                     loginLogoutButton.href = 'logout.php';
                     myScheduleButton.style.display = 'inline-block';
                     myReservationButton.style.display = 'inline-block';
-                    reserveTicketButton.href = `user_reservations.html?conference_id=${conferenceId}`;
     
                     if (data.role === 'admin') {
                         adminPageButton.style.display = 'inline-block';
@@ -110,7 +109,6 @@ function checkLoginStatus() {
                 } else {
                     loginLogoutButton.textContent = 'Login';
                     loginLogoutButton.href = 'login.html';
-                    reserveTicketButton.href = `reserve_tickets.html?conference_id=${conferenceId}`;
                 }
             })
             .catch(error => console.error('Chyba při kontrole přihlášení:', error));
