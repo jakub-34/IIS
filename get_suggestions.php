@@ -16,8 +16,23 @@ if ($conn->connect_error) {
 $conference_id = isset($_GET['conference_id']) ? intval($_GET['conference_id']) : 0;
 
 // SQL dotaz pro načtení konferencí
-$sql = "SELECT presentation_id, title, status, start_time, end_time, date, room_name, description FROM presentations WHERE conference_id = $conference_id";
+$sql = "SELECT 
+            p.presentation_id, 
+            p.title, 
+            p.status, 
+            p.start_time, 
+            p.end_time, 
+            p.date, 
+            p.room_name, 
+            p.description, 
+            u.name AS speaker_name, 
+            u.lastname AS speaker_lastname 
+        FROM presentations p
+        LEFT JOIN users u ON p.speaker_id = u.user_id
+        WHERE p.conference_id = $conference_id";
 $result = $conn->query($sql);
+
+
 
 // Převedení výsledků do JSON formátu
 $presentation = array();

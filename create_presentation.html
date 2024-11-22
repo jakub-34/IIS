@@ -45,7 +45,6 @@
         <h2 style="color: black;">Add presentation</h2>
         <input type="hidden" name="conference_id" value="<?php echo isset($_GET['conference_id']) ? $_GET['conference_id'] : ''; ?>">
         <input type="text" name="title" placeholder="Name" required>
-        <input type="url" name="photo-url" id="photo-url" placeholder="URL address of the photo">
         <textarea name="description" style="height: 100px;" placeholder="Description" required></textarea>
         <button type="submit" class="add-conference-button">Send</button>
     </form>

@@ -187,22 +187,12 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
         reserveTicketButton.style.textDecoration = 'none';
         reserveTicketButton.style.fontWeight = 'bold';
 
-        function checkLoginStatus() {
-            fetch('check_session.php')
-                .then(response => response.json())
-                .then(data => {
-                    const conferenceId = getConferenceId(); // Získame conference_id z URL
-                    if (data.isLoggedIn) {
-                        // Ak je používateľ prihlásený, odkaz bude viesť na stránku s rezerváciami
-                        reserveTicketButton.href = `create_reservation.php?conference_id=${conferenceId}`;
-                    } else {
-                        // Ak nie je prihlásený, presmerujeme ho na prihlásenie
-                        reserveTicketButton.href = `reserve_tickets.html?conference_id=${conferenceId}`
-                    }
-            })
-                .catch(error => console.error('Chyba pri kontrole prihlásenia:', error));
-            }
-        checkLoginStatus();
+        if (isLoggedIn) {
+            reserveTicketButton.href = `create_reservation.php?conference_id=${conferenceId}`;
+        } 
+        else {
+            reserveTicketButton.href = `reserve_tickets.html?conference_id=${conferenceId}`;
+        }
 
         reserveTicketButton.addEventListener('mouseover', function() {
             reserveTicketButton.style.backgroundColor = '#000';

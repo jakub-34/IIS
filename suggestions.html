@@ -14,8 +14,9 @@
             <a href="index.html" style="text-decoration: none; color: inherit;">
                 <i class="fas fa-home" style="margin-right: 5px;"></i>
             </a>
-            <a id="backLink" href="#" style="opacity: 0.5;">Presentations</a>
+            <a id="backLink" href="#" style="opacity: 0.5;">Conference Details</a>
             <a style="margin-left: 0.8vw;" href="#">Suggestions</a>
+            <a id="reservationLink" href="#" style="opacity: 0.5; margin-left: 0.8vw;">Reservations</a>
         </h2>
         <div style="float: right;">
             <!-- Tlačítko Login/Logout -->
@@ -36,16 +37,15 @@
 <script>
 
 
-if (sessionStorage.getItem('previousPage')) {
-    document.getElementById('backLink').href = sessionStorage.getItem('previousPage');
-}
-sessionStorage.setItem('previousPage_forLogin', window.location.href);
 // Funkce pro získání ID konference z URL parametru
+sessionStorage.setItem('previousPage_for_Login', window.location.href);
 function getConferenceId() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('id'); // Získá conference_id z URL, pokud existuje
 }
-
+const conferenceId = getConferenceId();
+document.getElementById('backLink').href = `conference_details.html?id=${conferenceId}`;
+document.getElementById('reservationLink').href = `manage_reservations.html?id=${conferenceId}`;
 
 // Funkce pro kontrolu stavu přihlášení
 function checkLoginStatus() {
@@ -120,7 +120,6 @@ function updatePresentation(data) {
 
 
 // Načtení prezentací z PHP skriptu
-const conferenceId = getConferenceId();
 fetch(`get_suggestions.php?conference_id=${conferenceId}`)
     .then(response => response.json())
     .then(data => {
@@ -139,6 +138,7 @@ fetch(`get_suggestions.php?conference_id=${conferenceId}`)
 
         const rightColumn = document.createElement('div');
         rightColumn.style.flex = '1';
+        console.log(data);
 
         // Iterace přes data konferencí
         data.forEach(conference => {
@@ -165,11 +165,18 @@ fetch(`get_suggestions.php?conference_id=${conferenceId}`)
             row1.innerHTML = `<td colspan="2" style="font-weight: bold;">${conference.title}</td>`;
             row1.style.paddingBottom = '10vw';
             wrapperDiv.appendChild(row1);
+            
+
+            const row2_1 = document.createElement('tr');
+            //row2_1.innerHTML = `<td>${new Date(conference.start_datetime).toLocaleDateString()} - ${new Date(conference.end_datetime).toLocaleDateString()}</td><td>${new Date(conference.start_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>-<td>${new Date(conference.end_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>`;
+            row2_1.innerHTML = `<td colspan="2">Speaker: ${conference.speaker_name} ${conference.speaker_lastname}</td>`;
+            wrapperDiv.appendChild(row2_1);
 
             const row2 = document.createElement('tr');
             //row2.innerHTML = `<td>${new Date(conference.start_datetime).toLocaleDateString()} - ${new Date(conference.end_datetime).toLocaleDateString()}</td><td>${new Date(conference.start_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>-<td>${new Date(conference.end_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>`;
             row2.innerHTML = `<td colspan="2">${conference.description}</td>`;
             wrapperDiv.appendChild(row2);
+            
 
 
             const row3 = document.createElement('tr');
@@ -193,7 +200,7 @@ fetch(`get_suggestions.php?conference_id=${conferenceId}`)
                 </td>
             `;
             wrapperDiv.appendChild(row4);
-            
+
             function formatTime(timeString) {
                 if (!timeString) return '';
 
@@ -237,13 +244,6 @@ fetch(`get_suggestions.php?conference_id=${conferenceId}`)
                     const startTimeInput = document.getElementById(`start_time-${currentCount}`);
                     const endTimeInput = document.getElementById(`end_time-${currentCount}`);
                     const roomInput = document.getElementById(`room-${currentCount}`);
-                    
-                    console.log(currentCount);
-                    /*if (!dateInput || !startTimeInput || !endTimeInput || !roomInput) {
-                        alert('Required inputs are missing from the DOM.');
-                        checkbox.checked = false;
-                        return;
-                    }*/
 
                     // Kontrola, zda jsou všechna povinná pole vyplněná
                     if (!dateInput.value || !startTimeInput.value || !endTimeInput.value || !roomInput.value) {
