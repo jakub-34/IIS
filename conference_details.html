@@ -16,6 +16,7 @@
             </a>
             <a href="#">Conference Details</a>
             <a id="suggestionLink" href="#" style="opacity: 0.5; margin-left: 0.8vw; visibility: hidden;">Suggestions</a>
+            <a id="reservationLink" href="#" style="opacity: 0.5; margin-left: 0.8vw; visibility: hidden;">Reservations</a>
         </h2>
         <div style="float: right;">
             <!-- Tlačítko Login/Logout -->
@@ -71,6 +72,9 @@ function loadUserData() {
         if (data.userId == data.organizerId){
             suggestionLink.style.visibility = 'visible';
             suggestionLink.href = `suggestions.html?id=${conferenceId}`;
+
+            reservationLink.style.visibility = 'visible';
+            reservationLink.href = `manage_reservations.html?id=${conferenceId}`;
         }
     })
 }
