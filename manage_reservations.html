@@ -43,7 +43,6 @@
                     const loginLogoutButton = document.getElementById('loginLogoutButton');
                     const adminPageButton = document.getElementById('adminPageButton');
                     const myScheduleButton = document.getElementById('myScheduleButton');
-                    const conferenceButton = document.getElementById('create_presentation');
                     const myReservationButton = document.getElementById('myReservationButton');
                 
                     if (data.isLoggedIn) {
@@ -52,21 +51,19 @@
                         loginLogoutButton.href = 'logout.php';
                         myScheduleButton.style.display = 'inline-block';
                         myReservationButton.style.display = 'inline-block';
-                        reserveTicketButton.href = `user_reservations.html?conference_id=${conferenceId}`;
                     
                         if (data.role === 'admin') {
                             adminPageButton.style.display = 'inline-block';
                         }
                     
-                        conferenceButton.style.display = 'flex';
                     } else {
                         loginLogoutButton.textContent = 'Login';
                         loginLogoutButton.href = 'login.html';
-                        reserveTicketButton.href = `reserve_tickets.html?conference_id=${conferenceId}`;
                     }
                 })
             .catch(error => console.error('Chyba při kontrole přihlášení:', error));
         }
+        
         // Extract the current `id` parameter from the URL
         function getConferenceId() {
             const urlParams = new URLSearchParams(window.location.search);
