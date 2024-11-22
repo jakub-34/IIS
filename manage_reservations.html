@@ -71,7 +71,8 @@
                             adminPageButton.style.display = 'inline-block';
                         }
                     
-                    } else {
+                    }
+                    else {
                         loginLogoutButton.textContent = 'Login';
                         loginLogoutButton.href = 'login.html';
                     }
@@ -137,7 +138,8 @@
                 const lastname = item.dataset.lastname;
                 if (lastname.includes(searchQuery)) {
                     item.style.display = 'flex';
-                } else {
+                }
+                else {
                     item.style.display = 'none';
                 }
             });
@@ -163,7 +165,8 @@
                         if (reservationList.children.length === 0) {
                             alert('All pending reservations have been processed.');
                         }
-                    } else {
+                    }
+                    else {
                         alert('Failed to confirm payment: ' + data.error);
                     }
                 })
