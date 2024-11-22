@@ -242,17 +242,27 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
             row1.innerHTML = `<td colspan="2" style="font-weight: bold;">${presentation.title}</td>`;
             row1.style.paddingBottom = '10vw';
             wrapperDiv.appendChild(row1);
+        
+
+            const row2_1 = document.createElement('tr');
+            row2_1.innerHTML = `<td colspan="2">Speaker: ${presentation.speaker_name} ${presentation.speaker_lastname}</td>`;
+            wrapperDiv.appendChild(row2_1);
 
             const row2 = document.createElement('tr');
             row2.innerHTML = `<td colspan="2">${presentation.description}</td>`;
             wrapperDiv.appendChild(row2);
-
+            
             const row3 = document.createElement('tr');
-            row3.innerHTML = `<td>${new Date(presentation.date).toLocaleDateString('cs-CZ')}</td><td>
-                ${presentation.start_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')} - 
-                ${presentation.end_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')}
-                </td>`;
+            row3.innerHTML = `<td colspan="2">Room: ${presentation.room_name}</td>`;
             wrapperDiv.appendChild(row3);
+            
+            const row6 = document.createElement('tr');
+            row6.innerHTML = `<td>
+                ${presentation.start_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')} - 
+                ${presentation.end_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')}   
+                </td>
+                <td style="padding-left: 1.5vw; text-align:right;">${new Date(presentation.date).toLocaleDateString('cs-CZ')}</td>`;
+            wrapperDiv.appendChild(row6);
 
             // Přidání checkboxu pouze pro přihlášené uživatele
             if (isLoggedIn) {

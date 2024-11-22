@@ -19,10 +19,9 @@
             <a id="reservationLink" href="#" style="opacity: 0.5; margin-left: 0.8vw;">Reservations</a>
         </h2>
         <div style="float: right;">
-            <!-- Tlačítko Login/Logout -->
             <a href="login.html" id="loginLogoutButton" class="login-button">Login</a>
             <a href="user_schedule.html" id="myScheduleButton" class="login-button" style="margin-right: 10px; display: none;">My Schedule</a>
-            <!-- Dynamické tlačítko Admin Page -->
+            <a href="user_reservations.html" id="myReservationButton" class="login-button" style="margin-right: 10px; display: none;">My Reservation</a>
             <a href="admin_page.html" id="adminPageButton" class="login-button" style="display: none; margin-right: 10px;">Admin Page</a>
         </div>
     </div>
@@ -54,11 +53,14 @@ function checkLoginStatus() {
         .then(data => {
             const loginLogoutButton = document.getElementById('loginLogoutButton');
             const adminPageButton = document.getElementById('adminPageButton');
+            const myScheduleButton = document.getElementById('myScheduleButton');
+            const myReservationButton = document.getElementById('myReservationButton');
 
             if (data.isLoggedIn) {
                 loginLogoutButton.textContent = 'Logout';
                 loginLogoutButton.href = 'logout.php';
                 myScheduleButton.style.display = 'inline-block';
+                myReservationButton.style.display = 'inline-block';
 
                 if (data.role === 'admin') {
                     adminPageButton.style.display = 'inline-block';
@@ -116,6 +118,17 @@ function updatePresentation(data) {
         .catch(error => {
             console.error('Error updating presentation:', error);
         });
+}
+
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
 
@@ -182,20 +195,21 @@ fetch(`get_suggestions.php?conference_id=${conferenceId}`)
             const row3 = document.createElement('tr');
             row3.innerHTML = `
                 <td>
-                    <label for="date-${currentCount}">Date:</label>
-                    <input type="date" id="date-${currentCount}" name="date-${currentCount}" value="${conference.date ? new Date(conference.date).toISOString().split('T')[0] : ''}">
-                </td>
+                <label for="date-${currentCount}">Date:</label>
+                <input type="date" id="date-${currentCount}" name="date-${currentCount}" value="${conference.date ? new Date(conference.date).toISOString().split('T')[0] : ''}">
+            </td>
             `;
             wrapperDiv.appendChild(row3);
 
+
             const row4 = document.createElement('tr');
             row4.innerHTML = `
-                <td>
-                    <label for="start_time-${currentCount}">Start Time:</label>
+                <td style="width: 50%;">
+                    <label for="start_time-${currentCount}">Begin:</label>
                     <input type="time" id="start_time-${currentCount}" name="start_time-${currentCount}" value="${conference.start_time ? formatTime(conference.start_time) : ''}">
                 </td>
-                <td>
-                    <label for="end_time-${currentCount}">End Time:</label>
+                <td style="width: 50%;">
+                    <label for="end_time-${currentCount}">End:</label>
                     <input type="time" id="end_time-${currentCount}" name="end_time-${currentCount}" value="${conference.end_time ? formatTime(conference.end_time) : ''}">
                 </td>
             `;
@@ -213,9 +227,9 @@ fetch(`get_suggestions.php?conference_id=${conferenceId}`)
             
             const row5 = document.createElement('tr');
             row5.innerHTML = `
-                <td>
+                <td style="display: flex; align-items: center; gap: 10px;">
                     <label>Room:</label>
-                    <input type="text" id="room-${currentCount}" value="${conference.room_name || ''}">
+                    <input type="text" style="width: 40%;" id="room-${currentCount}" value="${conference.room_name || ''}">
                 </td>
             `;
             wrapperDiv.appendChild(row5);
@@ -232,6 +246,7 @@ fetch(`get_suggestions.php?conference_id=${conferenceId}`)
             checkbox.type = 'checkbox';
             checkbox.id = `checkbox-${count}`;
             checkbox.name = `conference-${count}`;
+            checkbox.title = "Add to conference";
             checkbox.value = conference.presentation_id;
             
             // Pokud je status "approved", checkbox bude zaškrtnutý
@@ -244,15 +259,63 @@ fetch(`get_suggestions.php?conference_id=${conferenceId}`)
                     const startTimeInput = document.getElementById(`start_time-${currentCount}`);
                     const endTimeInput = document.getElementById(`end_time-${currentCount}`);
                     const roomInput = document.getElementById(`room-${currentCount}`);
-
                     // Kontrola, zda jsou všechna povinná pole vyplněná
                     if (!dateInput.value || !startTimeInput.value || !endTimeInput.value || !roomInput.value) {
                         alert('Please fill in all required fields before adding to the conference.');
                         checkbox.checked = false; // Vrátí checkbox do nezaškrtnutého stavu
                         return;
                     }
-                    else
-                    {
+
+                    const startTime = new Date(`${dateInput.value}T${startTimeInput.value}:00`);
+                    const endTime = new Date(`${dateInput.value}T${endTimeInput.value}:00`);
+
+                    if (startTime >= endTime) {
+                        alert('Start time must be earlier than end time.');
+                        checkbox.checked = false; // Vrátí checkbox do nezaškrtnutého stavu
+                        return;
+                    }
+                    else if (dateInput.value < conference.conference_start.split(' ')[0] || dateInput.value > conference.conference_end.split(' ')[0]) {
+                        alert('Date must be within the conference date range.');
+                        checkbox.checked = false; // Uncheck the checkbox if the date is out of range
+                        return;
+                    }
+                    else if ((dateInput.value == conference.conference_start.split(' ')[0] && conference.conference_start.split(' ')[1].slice(0, 5) > startTimeInput.value) 
+                            || (dateInput.value == conference.conference_end.split(' ')[0] && conference.conference_end.split(' ')[1].slice(0, 5) < endTimeInput.value)) {
+                        alert('Time must be within the conference date range.');
+                        checkbox.checked = false; // Uncheck the checkbox if the date is out of range
+                        return;
+                    }
+
+                    //else
+                    //{
+                    for (let i = 1; i < count; i++) {
+                        if (i != currentCount)
+                        {
+                            const date = document.getElementById(`date-${i}`);
+                            const room = document.getElementById(`room-${i}`);
+                            const startTime = document.getElementById(`start_time-${i}`);
+                            const endTime = document.getElementById(`end_time-${i}`);
+                            if (room.value == roomInput.value && date.value == dateInput.value)
+                            {
+                                if (startTimeInput.value >= startTime.value && startTimeInput.value < endTime.value) {
+                                    alert('2 lectures cannot take place in the same room at the same time.');
+                                    checkbox.checked = false;
+                                    return;
+                                }
+                                if (endTimeInput.value <= endTime.value && endTimeInput.value > startTime.value) {
+                                    alert('2 lectures cannot take place in the same room at the same time.');
+                                    checkbox.checked = false;
+                                    return;
+                                }
+                                if (endTimeInput.value > endTime.value && startTimeInput.value < startTime.value) {
+                                    alert('2 lectures cannot take place in the same room at the same time.');
+                                    checkbox.checked = false;
+                                    return;
+                                }
+                            }
+                        }
+                        
+                    }
                         const data = {
                             presentation_id: conference.presentation_id,
                             date: dateInput.value,
@@ -262,7 +325,7 @@ fetch(`get_suggestions.php?conference_id=${conferenceId}`)
                             status: 'approved'
                         };
                         updatePresentation(data);
-                    }
+                    //}
                 }
                 else{
                     updatePresentationStatus(conference.presentation_id, checkbox.checked ? 'approved' : 'not_approved')

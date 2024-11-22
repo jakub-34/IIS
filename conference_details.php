@@ -17,17 +17,31 @@ if ($conn->connect_error) {
 $conference_id = isset($_GET['conference_id']) ? intval($_GET['conference_id']) : 0;
 
 // SQL dotaz pro načtení detailů konferencie
-$sql_conference = "SELECT conference_id, name, description, location, start_datetime, end_datetime, capacity, genre FROM conferences WHERE conference_id = $conference_id";
-$result_conference = $conn->query($sql_conference);
+$sql = "SELECT conference_id, name, description, location, start_datetime, end_datetime, capacity, genre FROM conferences WHERE conference_id = $conference_id";
+$result = $conn->query($sql);
 
 // Inicializácia dát
 $conference_details = null;
-if ($result_conference->num_rows > 0) {
-    $conference_details = $result_conference->fetch_assoc();
+if ($result->num_rows > 0) {
+    $conference_details = $result->fetch_assoc();
 }
 
 // SQL dotaz pro načtení prezentací
-$sql_presentations = "SELECT presentation_id, title, description, status, date, start_time, end_time FROM presentations WHERE conference_id = $conference_id AND status = 'approved'";
+//$sql_presentations = "SELECT presentation_id, title, description, status, date, start_time, end_time FROM presentations WHERE conference_id = $conference_id AND status = 'approved'";
+$sql_presentations = "SELECT 
+    p.presentation_id, 
+    p.title, 
+    p.status, 
+    p.start_time, 
+    p.end_time, 
+    p.date, 
+    p.room_name, 
+    p.description, 
+    u.name AS speaker_name, 
+    u.lastname AS speaker_lastname
+    FROM presentations p
+    LEFT JOIN users u ON p.speaker_id = u.user_id
+    WHERE p.conference_id = $conference_id AND status = 'approved'";
 $result_presentations = $conn->query($sql_presentations);
 
 // Převedení výsledků do JSON formátu pro prezentace

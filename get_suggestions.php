@@ -26,9 +26,12 @@ $sql = "SELECT
             p.room_name, 
             p.description, 
             u.name AS speaker_name, 
-            u.lastname AS speaker_lastname 
+            u.lastname AS speaker_lastname,
+            c.start_datetime AS conference_start,
+            c.end_datetime AS conference_end
         FROM presentations p
         LEFT JOIN users u ON p.speaker_id = u.user_id
+        LEFT JOIN conferences c ON p.conference_id = c.conference_id
         WHERE p.conference_id = $conference_id";
 $result = $conn->query($sql);
 
