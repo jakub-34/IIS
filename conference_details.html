@@ -21,6 +21,7 @@
             <!-- Tlačítko Login/Logout -->
             <a href="login.html" id="loginLogoutButton" class="login-button">Login</a>
             <a href="user_schedule.html" id="myScheduleButton" class="login-button" style="margin-right: 10px; display: none;">My Schedule</a>
+            <a href="user_reservations.html" id="myReservationButton" class="login-button" style="margin-right: 10px; display: none;">My Reservation</a>
             <!-- Dynamické tlačítko Admin Page -->
             <a href="admin_page.html" id="adminPageButton" class="login-button" style="display: none; margin-right: 10px;">Admin Page</a>
         </div>
@@ -61,40 +62,6 @@ function setConferenceLink() {
     } 
 }
 
-// Zavoláme funkci, aby se odkaz správně nastavil při načtení stránky
-setConferenceLink();
-let isLoggedIn = false;
-// Funkce pro kontrolu stavu přihlášení
-function checkLoginStatus() {
-        fetch('check_session.php')
-            .then(response => response.json())
-            .then(data => {
-                const loginLogoutButton = document.getElementById('loginLogoutButton');
-                const adminPageButton = document.getElementById('adminPageButton');
-                const myScheduleButton = document.getElementById('myScheduleButton');
-                const conferenceButton = document.getElementById('create_presentation');
-    
-                if (data.isLoggedIn) {
-                    isLoggedIn = true; // Nastavíme stav přihlášení
-                    loginLogoutButton.textContent = 'Logout';
-                    loginLogoutButton.href = 'logout.php';
-                    myScheduleButton.style.display = 'inline-block';
-    
-                    if (data.role === 'admin') {
-                        adminPageButton.style.display = 'inline-block';
-                    }
-    
-                    conferenceButton.style.display = 'flex';
-                } else {
-                    loginLogoutButton.textContent = 'Login';
-                    loginLogoutButton.href = 'login.html';
-                }
-            })
-            .catch(error => console.error('Chyba při kontrole přihlášení:', error));
-    }
-// Načtení stavu přihlášení po otevření stránky
-checkLoginStatus();
-
 const conferenceId = getConferenceId();
 function loadUserData() {
     fetch(`get_conference_data.php?id=${conferenceId}`)
@@ -108,6 +75,45 @@ function loadUserData() {
     })
 }
 loadUserData();
+
+// Zavoláme funkci, aby se odkaz správně nastavil při načtení stránky
+setConferenceLink();
+let isLoggedIn = false;
+// Funkce pro kontrolu stavu přihlášení
+function checkLoginStatus() {
+        fetch('check_session.php')
+            .then(response => response.json())
+            .then(data => {
+                const loginLogoutButton = document.getElementById('loginLogoutButton');
+                const adminPageButton = document.getElementById('adminPageButton');
+                const myScheduleButton = document.getElementById('myScheduleButton');
+                const conferenceButton = document.getElementById('create_presentation');
+                const myReservationButton = document.getElementById('myReservationButton');
+    
+                if (data.isLoggedIn) {
+                    isLoggedIn = true; // Nastavíme stav přihlášení
+                    loginLogoutButton.textContent = 'Logout';
+                    loginLogoutButton.href = 'logout.php';
+                    myScheduleButton.style.display = 'inline-block';
+                    myReservationButton.style.display = 'inline-block';
+                    reserveTicketButton.href = `user_reservations.html?conference_id=${conferenceId}`;
+    
+                    if (data.role === 'admin') {
+                        adminPageButton.style.display = 'inline-block';
+                    }
+    
+                    conferenceButton.style.display = 'flex';
+                } else {
+                    loginLogoutButton.textContent = 'Login';
+                    loginLogoutButton.href = 'login.html';
+                    reserveTicketButton.href = `reserve_tickets.html?conference_id=${conferenceId}`;
+                }
+            })
+            .catch(error => console.error('Chyba při kontrole přihlášení:', error));
+    }
+// Načtení stavu přihlášení po otevření stránky
+checkLoginStatus();
+
 
 // Načtení prezentací z PHP skriptu
 fetch(`conference_details.php?conference_id=${conferenceId}`)
@@ -178,6 +184,23 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
         reserveTicketButton.style.border = '2px solid #000';
         reserveTicketButton.style.textDecoration = 'none';
         reserveTicketButton.style.fontWeight = 'bold';
+
+        function checkLoginStatus() {
+            fetch('check_session.php')
+                .then(response => response.json())
+                .then(data => {
+                    const conferenceId = getConferenceId(); // Získame conference_id z URL
+                    if (data.isLoggedIn) {
+                        // Ak je používateľ prihlásený, odkaz bude viesť na stránku s rezerváciami
+                        reserveTicketButton.href = `create_reservation.php?conference_id=${conferenceId}`;
+                    } else {
+                        // Ak nie je prihlásený, presmerujeme ho na prihlásenie
+                        reserveTicketButton.href = `reserve_tickets.html?conference_id=${conferenceId}`
+                    }
+            })
+                .catch(error => console.error('Chyba pri kontrole prihlásenia:', error));
+            }
+        checkLoginStatus();
 
         reserveTicketButton.addEventListener('mouseover', function() {
             reserveTicketButton.style.backgroundColor = '#000';

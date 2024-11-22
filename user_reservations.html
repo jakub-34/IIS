@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My reservation</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        // Check if the user is logged in and has the admin role
+        fetch('check_session.php')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.isLoggedIn) {
+                    // Redirect to the main page if not an admin
+                    window.location.href = 'index.html';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking session:', error);
+                // Redirect to the main page in case of an error
+                window.location.href = 'index.html';
+            });
+    </script>
+</head>
+<body>
+
+    <div class="header-container">
+        <h2 style="float: left;">
+            <a href="index.html" style="text-decoration: none; color: inherit;">
+                <i class="fas fa-home" style="margin-right: 5px;"></i>
+                My Reservations
+            </a>
+        </h2>
+        <div style="float: right;">
+            <a href="logout.php" id="loginLogoutButton" class="login-button">Logout</a>
+        </div>
+    </div>
+
+    <div class="body">
+        <div id="reservationsContainer" style="margin-top: 80px;">
+            <p id="emptyReservations" style="display: none; color: gray; text-align: center;">No reservations found</p>
+            <table id="reservationsTable" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Conference Name</th>
+                        <th>Tickets Count</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Fetch user reservations
+        fetch('get_user_reservations.php')
+            .then(response => response.json())
+            .then(data => {
+                const reservationsTable = document.getElementById('reservationsTable');
+                const emptyReservations = document.getElementById('emptyReservations');
+                const tbody = reservationsTable.querySelector('tbody');
+    
+                if (data.length === 0) {
+                    // Show message if no reservations
+                    emptyReservations.style.display = 'block';
+                    reservationsTable.style.display = 'none';
+                } else {
+                    // Populate the table with reservation data
+                    emptyReservations.style.display = 'none';
+                    reservationsTable.style.display = 'table';
+    
+                    data.forEach(reservation => {
+                        const row = document.createElement('tr');
+                        row.className = 'reservation-row'; // CSS class for styling
+                                                
+                        row.innerHTML = `
+                            <td>${reservation.conference_name}</td>
+                            <td>${reservation.tickets_count}</td>
+                            <td>${reservation.status}</td>
+                            <td style="text-align: center; vertical-align: middle;">
+                                <span 
+                                    class="cancel-icon" 
+                                    data-reservation-id="${reservation.reservation_id}" 
+                                    style="cursor: pointer; color: red;">&times;</span>
+                            </td>
+                        `;
+                        
+                        // Add event for canceling reservation
+                        const cancelIcon = row.querySelector('.cancel-icon');
+                        cancelIcon.addEventListener('click', () => {
+                            const reservationId = cancelIcon.getAttribute('data-reservation-id');
+                            console.log(`Removing reservation with ID: ${reservationId}`);
+                        
+                            if (reservationId && confirm(`Are you sure you want to cancel this reservation?`)) {
+                                removeReservation(reservationId, row);
+                            } else {
+                                console.error("Reservation ID is undefined or cancellation was cancelled.");
+                            }
+                        });
+                    
+                        tbody.appendChild(row);
+                    });
+                }
+            })
+            .catch(error => console.error('Error loading reservations:', error));
+    
+        // Function to remove reservation
+        function removeReservation(reservationId, row) {
+            console.log(`Removing reservation with ID: ${reservationId}`); // Debugging
+            fetch('remove_from_reservations.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reservation_id: reservationId })
+            })
+            .then(response => {
+                console.log('Response:', response); // Debugging
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Server response:', data); // Debugging
+                if (data.success) {
+                    row.remove();
+                
+                    // Check if the table is now empty
+                    const tbody = document.getElementById('reservationsTable').querySelector('tbody');
+                    if (tbody.children.length === 0) {
+                        document.getElementById('emptyReservations').style.display = 'block';
+                        document.getElementById('reservationsTable').style.display = 'none';
+                    }
+                } else {
+                    alert(`Failed to cancel reservation: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error removing reservation:', error);
+            });
+        }
+    </script>       
+
+</body>
+</html>
+   
