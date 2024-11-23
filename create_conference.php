@@ -8,6 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $description = $_POST['description'];
     $location = $_POST['location'];
+    $genre = $_POST['genre'];
     $start_datetime = str_replace('T', ' ', $_POST['start_datetime']) . ':00';
     $end_datetime = str_replace('T', ' ', $_POST['end_datetime']) . ':00';
     $price = $_POST['price'];
@@ -15,12 +16,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id_organizer = $_SESSION['user_id'];
 
     // Add new user into database
-    $stmt = $conn->prepare("INSERT INTO conferences (name, description, location, start_datetime, end_datetime, price, capacity, organizer_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssssdii", $name, $description, $location, $start_datetime, $end_datetime, $price, $capacity, $id_organizer);  
+    $stmt = $conn->prepare("INSERT INTO conferences (name, description, location, genre, start_datetime, end_datetime, price, capacity, organizer_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssdii", $name, $description, $location, $genre, $start_datetime, $end_datetime, $price, $capacity, $id_organizer);  
     $stmt->execute();
-    header("Location: index.html"); // Go to index.html
-    exit;
     $stmt->close();
+    $conn->close();
+    header("Location: index.html");
+    exit;
 }
-$conn->close();
 ?>

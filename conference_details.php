@@ -1,33 +1,18 @@
 <?php
-// Nastavení připojení k databázi
-$servername = "localhost"; // Hostitel databáze
-$username = "xfurik00";    // Uživatel databáze
-$password = "5ujomzam"; // Heslo databáze
-$database = "xfurik00";      // Název databáze
+include 'db_config.php';
 
-// Vytvoření připojení
-$conn = new mysqli($servername, $username, $password, $database);
-
-// Kontrola připojení
-if ($conn->connect_error) {
-    die("Připojení selhalo: " . $conn->connect_error);
-}
-
-// Získanie ID konferencie z GET parametru
 $conference_id = isset($_GET['conference_id']) ? intval($_GET['conference_id']) : 0;
 
-// SQL dotaz pro načtení detailů konferencie
+// SQL query to retrieve conference details
 $sql = "SELECT conference_id, name, description, location, start_datetime, end_datetime, capacity, genre FROM conferences WHERE conference_id = $conference_id";
 $result = $conn->query($sql);
 
-// Inicializácia dát
 $conference_details = null;
 if ($result->num_rows > 0) {
     $conference_details = $result->fetch_assoc();
 }
 
-// SQL dotaz pro načtení prezentací
-//$sql_presentations = "SELECT presentation_id, title, description, status, date, start_time, end_time FROM presentations WHERE conference_id = $conference_id AND status = 'approved'";
+// SQL query to load presentations
 $sql_presentations = "SELECT 
     p.presentation_id, 
     p.title, 
@@ -45,7 +30,6 @@ $sql_presentations = "SELECT
     ORDER BY p.date ASC, p.start_time ASC";
 $result_presentations = $conn->query($sql_presentations);
 
-// Převedení výsledků do JSON formátu pro prezentace
 $presentations = array();
 if ($result_presentations->num_rows > 0) {
     while ($row = $result_presentations->fetch_assoc()) {
@@ -54,16 +38,12 @@ if ($result_presentations->num_rows > 0) {
 }
 
 $sql_capacity = "SELECT 
-                    c.capacity AS total_capacity, 
-                    (c.capacity - IFNULL(SUM(r.tickets_count), 0)) AS remaining_capacity
-                FROM 
-                    conferences c
-                LEFT JOIN 
-                    reservations r ON c.conference_id = r.conference_id AND r.status != 'cancelled'
-                WHERE 
-                    c.conference_id = $conference_id
-                GROUP BY 
-                    c.conference_id";
+                c.capacity AS total_capacity, 
+                (c.capacity - IFNULL(SUM(r.tickets_count), 0)) AS remaining_capacity
+                FROM conferences c
+                LEFT JOIN reservations r ON c.conference_id = r.conference_id AND r.status != 'cancelled'
+                WHERE c.conference_id = $conference_id
+                GROUP BY c.conference_id";
 $result_capacity = $conn->query($sql_capacity);
 
 $capacity_info = null;
@@ -80,6 +60,5 @@ $response = array(
 header('Content-Type: application/json');
 echo json_encode($response);
 
-// Uzavření připojení
 $conn->close();
 ?>

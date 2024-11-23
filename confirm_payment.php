@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db_config.php'; // Include your database configuration
+include 'db_config.php';
 
 // Check if the reservation ID is provided
 $data = json_decode(file_get_contents('php://input'), true);
@@ -19,7 +19,8 @@ $stmt->bind_param("i", $reservation_id);
 
 if ($stmt->execute()) {
     echo json_encode(['success' => true]);
-} else {
+} 
+else {
     echo json_encode(['success' => false, 'error' => 'Database error: ' . $conn->error]);
 }
 

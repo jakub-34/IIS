@@ -6,22 +6,6 @@
     <title>Admin page</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script>
-        // Check if the user is logged in and has the admin role
-        fetch('check_session.php')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.isLoggedIn || data.role !== 'admin') {
-                    // Redirect to the main page if not an admin
-                    window.location.href = 'index.html';
-                }
-            })
-            .catch(error => {
-                console.error('Error checking session:', error);
-                // Redirect to the main page in case of an error
-                window.location.href = 'index.html';
-            });
-    </script>
 </head>
 <body>
 
@@ -29,8 +13,8 @@
         <h2 style="float: left;">
             <a href="index.html" style="text-decoration: none; color: inherit;">
                 <i class="fas fa-home" style="margin-right: 5px;"></i>
-                Admin page
             </a>
+            <a href="#">Admin page</a>
         </h2>
         <div style="float: right;">
             <a href="logout.php" id="loginLogoutButton" class="login-button">Logout</a>
@@ -47,13 +31,21 @@
 
     <script>
         let currentUser = null;
-        // Check logged in user
+        
+        // Check if the user is logged in and has the admin role
         fetch('check_session.php')
             .then(response => response.json())
             .then(data => {
+                if (!data.isLoggedIn || data.role !== 'admin') {
+                    window.location.href = 'index.html';
+                }
                 currentUser = data.username;
             })
-            .catch(error => console.error('Error loading data:', error));
+            .catch(error => {
+                console.error('Error checking session:', error);
+                window.location.href = 'index.html';
+            });
+
         // Load users from the server
         fetch('get_users.php')
             .then(response => response.json())
@@ -82,8 +74,7 @@
         
                     // First row with user name and surname
                     const nameRow = document.createElement('p');
-                    nameRow.textContent = `${user.name} ${user.lastname}`;
-                    nameRow.style.fontWeight = 'bold';
+                    nameRow.innerHTML = `<strong>Name: </strong>${user.name} ${user.lastname}`;
                     nameRow.style.marginBottom = '5px';
         
                     // Second row with user role and username
@@ -92,12 +83,14 @@
                     roleRow.style.alignItems = 'center';
         
                     const username = document.createElement('span');
-                    username.textContent = user.username;
+                    username.innerHTML = `<strong>Username: </strong>${user.username}`;
                     username.style.marginRight = '10px';
         
                     const roleLabel = document.createElement('label');
                     roleLabel.textContent = 'Admin';
                     roleLabel.style.marginRight = '5px';
+                    roleLabel.style.marginLeft = '5px';
+                    roleLabel.style.fontWeight = 'bold';
         
                     const roleCheckbox = document.createElement('input');
                     roleCheckbox.type = 'checkbox';
@@ -114,7 +107,7 @@
 
                     // Add delete icon
                     const deleteIcon = document.createElement('i');
-                    deleteIcon.className = 'fas fa-trash'; // Icon of trash
+                    deleteIcon.className = 'fas fa-trash';
                     deleteIcon.style.color = currentUser === user.username ? 'gray' : 'red';
                     deleteIcon.style.cursor = currentUser === user.username ? 'not-allowed' : 'pointer';
                     deleteIcon.style.position = 'absolute';
@@ -172,7 +165,8 @@
             .then(data => {
                 if (data.success) {
                     console.log(`Role of user with ID ${userId} was succesfully changet to ${newRole}.`);
-                } else {
+                } 
+                else {
                     console.error('Error with changing role:', data.error);
                 }
             })
@@ -192,8 +186,9 @@
             .then(data => {
                 if (data.success) {
                     console.log(`User with ID ${userId} was succesfully deleted.`);
-                    location.reload(); // Reload the page
-                } else {
+                    location.reload();
+                } 
+                else {
                     alert(data.error);
                     console.error('Error deleting users:', data.error);
                 }

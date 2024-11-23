@@ -1,5 +1,5 @@
 <?php
-include 'db_config.php'; // Connect to database
+include 'db_config.php';
 
 if (isset($_GET['username'])) {
     $username = $_GET['username'];
@@ -11,7 +11,8 @@ if (isset($_GET['username'])) {
 
     if ($stmt->num_rows > 0) {
         echo json_encode(["exists" => true]);
-    } else {
+    } 
+    else {
         echo json_encode(["exists" => false]);
     }
 

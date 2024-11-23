@@ -6,12 +6,6 @@
     <title>Registrace</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* Red border for wrong data */
-        .error-border {
-            border: 2px solid red;
-        }
-    </style>
 </head>
 <body>
 
@@ -37,6 +31,8 @@
             
             <input type="text" id="location" name="location" placeholder="Location" required>
             
+            <input type="text" id="genre" name="genre" placeholder="Genre" required>
+            
             <input type="text" id="start_datetime" name="start_datetime" placeholder="Start time" required onfocus="this.type='datetime-local'" onblur="if(!this.value) this.type='text';">
             
             <input type="text" id="end_datetime" name="end_datetime" placeholder="End time" required onfocus="this.type='datetime-local'" onblur="if(!this.value) this.type='text';">
@@ -57,19 +53,9 @@
         .then(response => response.json())
         .then(data => {
             if (!data.isLoggedIn) {
-                // Redirect to the main page
                 window.location.href = 'index.html';
             }
-        })
-        .catch(error => {
-            console.error('Error checking session:', error);
-            // Redirect to the main page in case of an error
-            window.location.href = 'index.html';
-        });
 
-    fetch('check_session.php')
-        .then(response => response.json())
-        .then(data => {
             const loginLogoutButton = document.getElementById('loginLogoutButton');
         
             if (data.isLoggedIn) {
@@ -82,9 +68,11 @@
                 loginLogoutButton.href = 'login.html';
             }
         })
-        .catch(error => console.error('Chyba při kontrole přihlášení:', error));
+        .catch(error => {
+            console.error('Error checking session:', error);
+            window.location.href = 'index.html';
+        });
 
-        // Zajistí, že se skript spustí až po načtení DOM
         document.addEventListener("DOMContentLoaded", function() {
             const form = document.getElementById("conferenceForm");
             console.log("asdas");
@@ -92,10 +80,10 @@
                 const startDateTime = document.getElementById("start_datetime").value;
                 const endDateTime = document.getElementById("end_datetime").value;
 
-                // Validace: End musí být větší než Start
+                // End must be greater than Start
                 if (new Date(endDateTime) <= new Date(startDateTime)) {
                     alert("End datetime must be greater than start datetime.");
-                    event.preventDefault(); // Zrušení odeslání formuláře
+                    event.preventDefault(); // Cancel form submission
                 }
             });
         });

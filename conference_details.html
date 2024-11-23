@@ -19,11 +19,9 @@
             <a id="reservationLink" href="#" style="opacity: 0.5; margin-left: 0.8vw; visibility: hidden;">Reservations</a>
         </h2>
         <div style="float: right;">
-            <!-- Tlačítko Login/Logout -->
             <a href="login.html" id="loginLogoutButton" class="login-button">Login</a>
             <a href="user_schedule.html" id="myScheduleButton" class="login-button" style="margin-right: 10px; display: none;">My Schedule</a>
             <a href="user_reservations.html" id="myReservationButton" class="login-button" style="margin-right: 10px; display: none;">My Reservation</a>
-            <!-- Dynamické tlačítko Admin Page -->
             <a href="admin_page.html" id="adminPageButton" class="login-button" style="display: none; margin-right: 10px;">Admin Page</a>
         </div>
     </div>
@@ -35,315 +33,307 @@
         </table>
     </div>
     
-    <a class="fixed-button" id="create_presentation" style="display: none;">
+    <a class="fixed-button" id="create_presentation" title="Add presentation suggestion" style="display: none;">
         <i class="fas fa-plus"></i>
     </a>
 
 
-<script>
-
-sessionStorage.setItem('previousPage', window.location.href);
-// Funkce pro získání ID konference z URL parametru
-function getConferenceId() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('id'); // Získá conference_id z URL, pokud existuje
-}
-
-// Funkce pro nastavení URL odkazu s conference_id
-function setConferenceLink() {
-    const conferenceId = getConferenceId(); // Získáme conference_id z URL
-    const createConferenceButton = document.getElementById('create_presentation');
-
-    // Zkontrolujme, zda bylo ID načteno a jestli máme tlačítko
-    console.log('id:', conferenceId);
-    console.log('createConferenceButton:', createConferenceButton);
-
-    if (conferenceId && createConferenceButton) {
-        createConferenceButton.href = `create_presentation.html?conference_id=${conferenceId}`;
-    } 
-}
-
-const conferenceId = getConferenceId();
-function loadUserData() {
-    fetch(`get_conference_data.php?id=${conferenceId}`)
-    .then(response => response.json())
-    .then(data => {
-        const suggestionLink = document.getElementById('suggestionLink');
-        if (data.userId == data.organizerId){
-            suggestionLink.style.visibility = 'visible';
-            suggestionLink.href = `suggestions.html?id=${conferenceId}`;
-
-            reservationLink.style.visibility = 'visible';
-            reservationLink.href = `manage_reservations.html?id=${conferenceId}`;
+    <script>
+        // Function to get conference ID from URL parameter
+        function getConferenceId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
         }
-    })
-}
-loadUserData();
 
-// Zavoláme funkci, aby se odkaz správně nastavil při načtení stránky
-setConferenceLink();
-let isLoggedIn = false;
-// Funkce pro kontrolu stavu přihlášení
-function checkLoginStatus() {
-        fetch('check_session.php')
+        // Function to set URL link with conference_id
+        function setConferenceLink() {
+            const conferenceId = getConferenceId();
+            const createConferenceButton = document.getElementById('create_presentation');
+
+            if (conferenceId && createConferenceButton) {
+                createConferenceButton.href = `create_presentation.html?conference_id=${conferenceId}`;
+            } 
+        }
+
+        const conferenceId = getConferenceId();
+        function loadUserData() {
+            fetch(`get_conference_data.php?id=${conferenceId}`)
             .then(response => response.json())
             .then(data => {
-                const loginLogoutButton = document.getElementById('loginLogoutButton');
-                const adminPageButton = document.getElementById('adminPageButton');
-                const myScheduleButton = document.getElementById('myScheduleButton');
-                const conferenceButton = document.getElementById('create_presentation');
-                const myReservationButton = document.getElementById('myReservationButton');
-    
-                if (data.isLoggedIn) {
-                    isLoggedIn = true; // Nastavíme stav přihlášení
-                    loginLogoutButton.textContent = 'Logout';
-                    loginLogoutButton.href = 'logout.php';
-                    myScheduleButton.style.display = 'inline-block';
-                    myReservationButton.style.display = 'inline-block';
-    
-                    if (data.role === 'admin') {
-                        adminPageButton.style.display = 'inline-block';
-                    }
-    
-                    conferenceButton.style.display = 'flex';
-                } else {
-                    loginLogoutButton.textContent = 'Login';
-                    loginLogoutButton.href = 'login.html';
+                const suggestionLink = document.getElementById('suggestionLink');
+                if (data.userId == data.organizerId){
+                    suggestionLink.style.visibility = 'visible';
+                    suggestionLink.href = `suggestions.html?id=${conferenceId}`;
+
+                    reservationLink.style.visibility = 'visible';
+                    reservationLink.href = `manage_reservations.html?id=${conferenceId}`;
                 }
             })
-            .catch(error => console.error('Chyba při kontrole přihlášení:', error));
-    }
-// Načtení stavu přihlášení po otevření stránky
-checkLoginStatus();
-
-
-// Načtení prezentací z PHP skriptu
-fetch(`conference_details.php?conference_id=${conferenceId}`)
-    .then(response => response.json())
-    .then(data => {
-        var count = 1;
-        const tableBody = document.getElementById('presentationTable');
-
-        const conferenceDetails = data.conference_details;
-        const capacityInfo = data.capacity_info;
-
-        const conferenceInfoContainer = document.createElement('div');
-        conferenceInfoContainer.style.display = 'flex'; 
-        conferenceInfoContainer.style.justifyContent = 'space-between';
-        conferenceInfoContainer.style.alignItems = 'flex-start';
-        conferenceInfoContainer.style.marginBottom = '20px';
-        conferenceInfoContainer.style.padding = '15px';
-        conferenceInfoContainer.style.border = '1px solid #ccc';
-        conferenceInfoContainer.style.borderRadius = '8px';
-        conferenceInfoContainer.style.backgroundColor = '#f9f9f9';
-        conferenceInfoContainer.style.position = 'relative';
-        conferenceInfoContainer.style.height = 'auto';
-
-        const leftColumnC = document.createElement('div');
-        leftColumnC.style.flex = '1'; 
-        leftColumnC.style.marginRight = '20px';
-
-        const title = document.createElement('h2');
-        title.textContent = conferenceDetails.name;
-        title.style.color = 'black';
-        title.style.marginBottom = '0px';
-
-        const description = document.createElement('p');
-        description.textContent = conferenceDetails.description;
-        description.style.marginBottom = '30px';
-        description.style.marginLeft = '20px';
-        description.style.marginTop = '0px';
-
-        const details = document.createElement('p');
-        details.innerHTML = `
-            <strong>Location:</strong> ${conferenceDetails.location}<br>
-            <strong>Date-time:</strong> 
-                ${new Date(conferenceDetails.start_datetime).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' })} 
-                ${new Date(conferenceDetails.start_datetime).toLocaleDateString('cs-CZ')} - 
-                ${new Date(conferenceDetails.end_datetime).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' })} 
-                ${new Date(conferenceDetails.end_datetime).toLocaleDateString('cs-CZ')}<br>
-            <strong>Capacity:</strong> ${capacityInfo.remaining_capacity}/${capacityInfo.total_capacity} <br>
-            <strong>Genre:</strong> ${conferenceDetails.genre}
-        `;
-        details.style.marginLeft = '20px';
-        details.style.bottom = '30px';
-
-        leftColumnC.appendChild(title);
-        leftColumnC.appendChild(description);
-        leftColumnC.appendChild(details);
-
-        const buttonContainer = document.createElement('div');
-        buttonContainer.style.position = 'absolute';
-        buttonContainer.style.bottom = '30px';
-        buttonContainer.style.right = '30px'; 
-
-        const reserveTicketButton = document.createElement('a');
-        reserveTicketButton.id = 'reserve_ticket_button';
-        reserveTicketButton.href = `reserve_tickets.html?conference_id=${conferenceDetails.conference_id}`;
-        reserveTicketButton.textContent = 'Reserve Ticket';
-        reserveTicketButton.style.display = 'inline-block';
-        reserveTicketButton.style.color = 'black';
-        reserveTicketButton.style.backgroundColor = '#fff';
-        reserveTicketButton.style.padding = '10px 20px';
-        reserveTicketButton.style.borderRadius = '5px';
-        reserveTicketButton.style.border = '2px solid #000';
-        reserveTicketButton.style.textDecoration = 'none';
-        reserveTicketButton.style.fontWeight = 'bold';
-
-        if (isLoggedIn) {
-            reserveTicketButton.href = `create_reservation.php?conference_id=${conferenceId}`;
-        } 
-        else {
-            reserveTicketButton.href = `reserve_tickets.html?conference_id=${conferenceId}`;
         }
+        loadUserData();
+        setConferenceLink();
 
-        reserveTicketButton.addEventListener('mouseover', function() {
-            reserveTicketButton.style.backgroundColor = '#000';
-            reserveTicketButton.style.color = '#fff';
-        });
-        reserveTicketButton.addEventListener('mouseout', function() {
-            reserveTicketButton.style.backgroundColor = '#fff';
-            reserveTicketButton.style.color = '#000';
-        });
-
-        buttonContainer.appendChild(reserveTicketButton);
-        conferenceInfoContainer.appendChild(leftColumnC);
-        conferenceInfoContainer.appendChild(buttonContainer);
-        tableBody.appendChild(conferenceInfoContainer);
-
-
-        // Hlavní obalovací div pro dva sloupce
-        const mainContainer = document.createElement('div');
-        mainContainer.style.display = 'flex';        
-        mainContainer.style.justifyContent = 'space-between';
-        mainContainer.style.gap = '20px';            
-
-        // Levý a pravý sloupec
-        const leftColumn = document.createElement('div');
-        leftColumn.style.flex = '1';
-
-        const rightColumn = document.createElement('div');
-        rightColumn.style.flex = '1';
-
-        // Iterace přes data konferencí
-        data.presentations.forEach(presentation => {
-            const containerDiv = document.createElement('div');
-            containerDiv.style.display = 'flex';
-            containerDiv.style.alignItems = 'center';
-            containerDiv.style.marginBottom = '10px';
-            containerDiv.style.cursor = 'pointer';
-
-            const text = document.createElement('p');
-            text.innerHTML = `${count}`;
-            text.style.marginRight = '10px';
-            text.style.fontWeight = 'bold';
-
-            const wrapperDiv = document.createElement('div');
-            wrapperDiv.className = "conference";
-
-            const row1 = document.createElement('tr');
-            row1.innerHTML = `<td colspan="2"><strong>Title:</strong> ${presentation.title}</td>`;
-            row1.style.paddingBottom = '10vw';
-            wrapperDiv.appendChild(row1);
-        
-
-            const row2_1 = document.createElement('tr');
-            row2_1.innerHTML = `<td colspan="2"><strong>Speaker:</strong> ${presentation.speaker_name} ${presentation.speaker_lastname}</td>`;
-            wrapperDiv.appendChild(row2_1);
-
-            const row2 = document.createElement('tr');
-            row2.innerHTML = `<td colspan="2"><p style="width: 95%; margin: 5px 0;"><strong>Description:</strong> ${presentation.description}</p></td>`;
-            wrapperDiv.appendChild(row2);
-            
-            const row3 = document.createElement('tr');
-            row3.innerHTML = `<td colspan="2"><strong>Room:</strong> ${presentation.room_name}</td>`;
-            wrapperDiv.appendChild(row3);
-            
-            const row6 = document.createElement('tr');
-            row6.innerHTML = `<td colspan="2"><strong>Time:</strong>
-                ${presentation.start_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')} - 
-                ${presentation.end_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')}   
-                <p style="margin: 0; margin-left: 1vw; display: inline-block;">${new Date(presentation.date).toLocaleDateString('cs-CZ')}</p>
-                </td>`
-            wrapperDiv.appendChild(row6);
-
-            // Přidání checkboxu pouze pro přihlášené uživatele
-            if (isLoggedIn) {
-                fetch(`check_schedule.php?presentation_id=${presentation.presentation_id}`)
+        let isLoggedIn = false;
+        // Login status check function
+        function checkLoginStatus() {
+            fetch('check_session.php')
                 .then(response => response.json())
-                .then(scheduleData => {
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.style.position = 'absolute';
-                    checkbox.style.right = '10px';
-                    checkbox.style.top = '50%';
-                    checkbox.style.transform = 'translateY(-50%)';
-                    checkbox.title = 'Add to Schedule';
-
-                    checkbox.checked = scheduleData.isInSchedule;
-
-                    wrapperDiv.style.position = 'relative';
-                    wrapperDiv.appendChild(checkbox);
-
-                    checkbox.addEventListener('change', () => {
-                        if (checkbox.checked) {
-                            fetch('add_to_schedule.php', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ presentation_id: presentation.presentation_id })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (!data.success) {
-                                    alert('Failed to add to schedule.');
-                                    checkbox.checked = false;
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error adding to schedule:', error);
-                                checkbox.checked = false;
-                            });
-                        } else {
-                            fetch('remove_from_schedule.php', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ presentation_id: presentation.presentation_id })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (!data.success) {
-                                    alert('Failed to remove from schedule.');
-                                    checkbox.checked = true;
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error removing from schedule:', error);
-                                checkbox.checked = true;
-                            });
+                .then(data => {
+                    const loginLogoutButton = document.getElementById('loginLogoutButton');
+                    const adminPageButton = document.getElementById('adminPageButton');
+                    const myScheduleButton = document.getElementById('myScheduleButton');
+                    const conferenceButton = document.getElementById('create_presentation');
+                    const myReservationButton = document.getElementById('myReservationButton');
+        
+                    if (data.isLoggedIn) {
+                        isLoggedIn = true;
+                        loginLogoutButton.textContent = 'Logout';
+                        loginLogoutButton.href = 'logout.php';
+                        myScheduleButton.style.display = 'inline-block';
+                        myReservationButton.style.display = 'inline-block';
+        
+                        if (data.role === 'admin') {
+                            adminPageButton.style.display = 'inline-block';
                         }
-                    });
+        
+                        conferenceButton.style.display = 'flex';
+                    } 
+                    else {
+                        loginLogoutButton.textContent = 'Login';
+                        loginLogoutButton.href = 'login.html';
+                    }
                 })
-                .catch(error => console.error('Error checking schedule:', error));
+                .catch(error => console.error('Chyba při kontrole přihlášení:', error));
             }
+        checkLoginStatus();
 
-            containerDiv.appendChild(text);
-            containerDiv.appendChild(wrapperDiv);
 
-            if (count % 2 !== 0) {
-                leftColumn.appendChild(containerDiv);
-            } else {
-                rightColumn.appendChild(containerDiv);
-            }
+        // Loading presentations from a PHP script
+        fetch(`conference_details.php?conference_id=${conferenceId}`)
+            .then(response => response.json())
+            .then(data => {
+                var count = 1;
+                const tableBody = document.getElementById('presentationTable');
 
-            count++;
-        });
+                const conferenceDetails = data.conference_details;
+                const capacityInfo = data.capacity_info;
 
-        mainContainer.appendChild(leftColumn);
-        mainContainer.appendChild(rightColumn);
-        tableBody.appendChild(mainContainer);
+                const conferenceInfoContainer = document.createElement('div');
+                conferenceInfoContainer.style.display = 'flex'; 
+                conferenceInfoContainer.style.justifyContent = 'space-between';
+                conferenceInfoContainer.style.alignItems = 'flex-start';
+                conferenceInfoContainer.style.marginBottom = '20px';
+                conferenceInfoContainer.style.padding = '15px';
+                conferenceInfoContainer.style.border = '1px solid #ccc';
+                conferenceInfoContainer.style.borderRadius = '8px';
+                conferenceInfoContainer.style.backgroundColor = '#f9f9f9';
+                conferenceInfoContainer.style.position = 'relative';
+                conferenceInfoContainer.style.height = 'auto';
 
-    })
-</script>
+                const leftColumnC = document.createElement('div');
+                leftColumnC.style.flex = '1'; 
+                leftColumnC.style.marginRight = '20px';
+
+                const title = document.createElement('h2');
+                title.textContent = conferenceDetails.name;
+                title.style.color = 'black';
+                title.style.marginBottom = '0px';
+
+                const description = document.createElement('p');
+                description.textContent = conferenceDetails.description;
+                description.style.marginBottom = '30px';
+                description.style.marginLeft = '20px';
+                description.style.marginTop = '0px';
+
+                const details = document.createElement('p');
+                details.innerHTML = `
+                    <strong>Location:</strong> ${conferenceDetails.location}<br>
+                    <strong>Date-time:</strong> 
+                        ${new Date(conferenceDetails.start_datetime).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' })} 
+                        ${new Date(conferenceDetails.start_datetime).toLocaleDateString('cs-CZ')} - 
+                        ${new Date(conferenceDetails.end_datetime).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' })} 
+                        ${new Date(conferenceDetails.end_datetime).toLocaleDateString('cs-CZ')}<br>
+                    <strong>Capacity:</strong> ${capacityInfo.remaining_capacity}/${capacityInfo.total_capacity} <br>
+                    <strong>Genre:</strong> ${conferenceDetails.genre}
+                `;
+                details.style.marginLeft = '20px';
+                details.style.bottom = '30px';
+
+                leftColumnC.appendChild(title);
+                leftColumnC.appendChild(description);
+                leftColumnC.appendChild(details);
+
+                const buttonContainer = document.createElement('div');
+                buttonContainer.style.position = 'absolute';
+                buttonContainer.style.bottom = '30px';
+                buttonContainer.style.right = '30px'; 
+
+                const reserveTicketButton = document.createElement('a');
+                reserveTicketButton.id = 'reserve_ticket_button';
+                reserveTicketButton.href = `reserve_tickets.html?conference_id=${conferenceDetails.conference_id}`;
+                reserveTicketButton.textContent = 'Reserve Ticket';
+                reserveTicketButton.style.display = 'inline-block';
+                reserveTicketButton.style.color = 'black';
+                reserveTicketButton.style.backgroundColor = '#fff';
+                reserveTicketButton.style.padding = '10px 20px';
+                reserveTicketButton.style.borderRadius = '5px';
+                reserveTicketButton.style.border = '2px solid #000';
+                reserveTicketButton.style.textDecoration = 'none';
+                reserveTicketButton.style.fontWeight = 'bold';
+
+                if (isLoggedIn) {
+                    reserveTicketButton.href = `create_reservation.php?conference_id=${conferenceId}`;
+                } 
+                else {
+                    reserveTicketButton.href = `reserve_tickets.html?conference_id=${conferenceId}`;
+                }
+
+                reserveTicketButton.addEventListener('mouseover', function() {
+                    reserveTicketButton.style.backgroundColor = '#000';
+                    reserveTicketButton.style.color = '#fff';
+                });
+                reserveTicketButton.addEventListener('mouseout', function() {
+                    reserveTicketButton.style.backgroundColor = '#fff';
+                    reserveTicketButton.style.color = '#000';
+                });
+
+                buttonContainer.appendChild(reserveTicketButton);
+                conferenceInfoContainer.appendChild(leftColumnC);
+                conferenceInfoContainer.appendChild(buttonContainer);
+                tableBody.appendChild(conferenceInfoContainer);
+
+
+                // Main wrapper div for two columns
+                const mainContainer = document.createElement('div');
+                mainContainer.style.display = 'flex';        
+                mainContainer.style.justifyContent = 'space-between';
+                mainContainer.style.gap = '20px';            
+
+                const leftColumn = document.createElement('div');
+                leftColumn.style.flex = '1';
+
+                const rightColumn = document.createElement('div');
+                rightColumn.style.flex = '1';
+
+                // Iteration over conference dates
+                data.presentations.forEach(presentation => {
+                    const containerDiv = document.createElement('div');
+                    containerDiv.style.display = 'flex';
+                    containerDiv.style.alignItems = 'center';
+                    containerDiv.style.marginBottom = '10px';
+                    containerDiv.style.cursor = 'pointer';
+
+                    const text = document.createElement('p');
+                    text.innerHTML = `${count}`;
+                    text.style.marginRight = '10px';
+                    text.style.fontWeight = 'bold';
+
+                    const wrapperDiv = document.createElement('div');
+                    wrapperDiv.className = "conference";
+
+                    const row1 = document.createElement('tr');
+                    row1.innerHTML = `<td colspan="2"><strong>Title:</strong> ${presentation.title}</td>`;
+                    row1.style.paddingBottom = '10vw';
+                    wrapperDiv.appendChild(row1);
+                
+                    const row2_1 = document.createElement('tr');
+                    row2_1.innerHTML = `<td colspan="2"><strong>Speaker:</strong> ${presentation.speaker_name} ${presentation.speaker_lastname}</td>`;
+                    wrapperDiv.appendChild(row2_1);
+
+                    const row2 = document.createElement('tr');
+                    row2.innerHTML = `<td colspan="2"><p style="width: 95%; margin: 5px 0;"><strong>Description:</strong> ${presentation.description}</p></td>`;
+                    wrapperDiv.appendChild(row2);
+                    
+                    const row3 = document.createElement('tr');
+                    row3.innerHTML = `<td colspan="2"><strong>Room:</strong> ${presentation.room_name}</td>`;
+                    wrapperDiv.appendChild(row3);
+                    
+                    const row6 = document.createElement('tr');
+                    row6.innerHTML = `<td colspan="2"><strong>Time:</strong>
+                        ${presentation.start_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')} - 
+                        ${presentation.end_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')}   
+                        <p style="margin: 0; margin-left: 1vw; display: inline-block;">${new Date(presentation.date).toLocaleDateString('cs-CZ')}</p>
+                        </td>`
+                    wrapperDiv.appendChild(row6);
+
+                    // Adding a checkbox for logged in users only
+                    if (isLoggedIn) {
+                        fetch(`check_schedule.php?presentation_id=${presentation.presentation_id}`)
+                        .then(response => response.json())
+                        .then(scheduleData => {
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.style.position = 'absolute';
+                            checkbox.style.right = '10px';
+                            checkbox.style.top = '50%';
+                            checkbox.style.transform = 'translateY(-50%)';
+                            checkbox.title = 'Add to Schedule';
+
+                            checkbox.checked = scheduleData.isInSchedule;
+
+                            wrapperDiv.style.position = 'relative';
+                            wrapperDiv.appendChild(checkbox);
+
+                            checkbox.addEventListener('change', () => {
+                                if (checkbox.checked) {
+                                    fetch('add_to_schedule.php', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ presentation_id: presentation.presentation_id })
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (!data.success) {
+                                                alert('Failed to add to schedule.');
+                                                checkbox.checked = false;
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error adding to schedule:', error);
+                                            checkbox.checked = false;
+                                        });
+                                } 
+                                else {
+                                    fetch('remove_from_schedule.php', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ presentation_id: presentation.presentation_id })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (!data.success) {
+                                            alert('Failed to remove from schedule.');
+                                            checkbox.checked = true;
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error removing from schedule:', error);
+                                        checkbox.checked = true;
+                                    });
+                                }
+                            });
+                        })
+                        .catch(error => console.error('Error checking schedule:', error));
+                    }
+
+                    containerDiv.appendChild(text);
+                    containerDiv.appendChild(wrapperDiv);
+
+                    if (count % 2 !== 0) {
+                        leftColumn.appendChild(containerDiv);
+                    } else {
+                        rightColumn.appendChild(containerDiv);
+                    }
+
+                    count++;
+                });
+
+                mainContainer.appendChild(leftColumn);
+                mainContainer.appendChild(rightColumn);
+                tableBody.appendChild(mainContainer);
+
+            })
+    </script>
 
 </body>
 </html>

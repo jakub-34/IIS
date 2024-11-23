@@ -1,5 +1,5 @@
 <?php
-include 'db_config.php'; // Connection to database
+include 'db_config.php';
 
 session_start();
 
@@ -15,10 +15,12 @@ if (isset($_SESSION['user_id']) && isset($_GET['conference_id'])) {
     if ($stmt->execute()) {
         header('Location: user_reservations.html');
         exit;
-    } else {
+    } 
+    else {
         die("Error: " . $stmt->error);
     }
-} else {
+} 
+else {
     header('Location: login.php');
     exit;
 }

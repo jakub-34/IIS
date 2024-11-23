@@ -73,7 +73,7 @@ h2 a
     margin-bottom: 0.5%;
     margin-top: 0.5%;
     background-color: #DEDEDE;
-    border-radius: 15px;
+    border-radius: 5px;
     padding: 0.5vw;
 }
 
@@ -236,7 +236,6 @@ h2 a
     color: darkred;
 }
 
-/* Search bar styling */
 #searchBar {
     width: calc(100% - 22px);
     padding: 10px;
@@ -246,7 +245,6 @@ h2 a
     margin-bottom: 20px;
 }
 
-/* Reservation list styling */
 #reservationList {
     list-style: none;
     padding: 0;
