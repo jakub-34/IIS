@@ -157,8 +157,11 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
         const details = document.createElement('p');
         details.innerHTML = `
             <strong>Location:</strong> ${conferenceDetails.location}<br>
-            <strong>Date-time:</strong> ${new Date(conferenceDetails.start_datetime).toLocaleString('cs-CZ')} - 
-            ${new Date(conferenceDetails.end_datetime).toLocaleString('cs-CZ')}<br>
+            <strong>Date-time:</strong> 
+                ${new Date(conferenceDetails.start_datetime).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' })} 
+                ${new Date(conferenceDetails.start_datetime).toLocaleDateString('cs-CZ')} - 
+                ${new Date(conferenceDetails.end_datetime).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' })} 
+                ${new Date(conferenceDetails.end_datetime).toLocaleDateString('cs-CZ')}<br>
             <strong>Capacity:</strong> ${capacityInfo.remaining_capacity}/${capacityInfo.total_capacity} <br>
             <strong>Genre:</strong> ${conferenceDetails.genre}
         `;
@@ -249,7 +252,7 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
             wrapperDiv.appendChild(row2_1);
 
             const row2 = document.createElement('tr');
-            row2.innerHTML = `<td colspan="2">${presentation.description}</td>`;
+            row2.innerHTML = `<td colspan="2"><p style="width: 95%; margin: 5px 0;">${presentation.description}</p></td>`;
             wrapperDiv.appendChild(row2);
             
             const row3 = document.createElement('tr');
@@ -257,11 +260,11 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
             wrapperDiv.appendChild(row3);
             
             const row6 = document.createElement('tr');
-            row6.innerHTML = `<td>
+            row6.innerHTML = `<td colspan="2">
                 ${presentation.start_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')} - 
                 ${presentation.end_time.split(':').slice(0, 2).map(part => part.padStart(2, '0')).join(':')}   
-                </td>
-                <td style="padding-left: 1.5vw; text-align:right;">${new Date(presentation.date).toLocaleDateString('cs-CZ')}</td>`;
+                <p style="margin: 0; margin-left: 1vw; display: inline-block;">${new Date(presentation.date).toLocaleDateString('cs-CZ')}</p>
+                </td>`
             wrapperDiv.appendChild(row6);
 
             // Přidání checkboxu pouze pro přihlášené uživatele
@@ -340,70 +343,6 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
         tableBody.appendChild(mainContainer);
 
     })
-/*fetch(`conference_details.php?conference_id=${conferenceId}`)
-    .then(response => response.json())
-    .then(data => {
-        var count = 1;
-        const tableBody = document.getElementById('presentationTable');
-
-        // Hlavní obalovací div pro dva sloupce
-        const mainContainer = document.createElement('div');
-        mainContainer.style.display = 'flex';        
-        mainContainer.style.justifyContent = 'space-between';
-        mainContainer.style.gap = '20px';            
-
-
-        // Levý a pravý sloupec
-        const leftColumn = document.createElement('div');
-        leftColumn.style.flex = '1';
-
-        const rightColumn = document.createElement('div');
-        rightColumn.style.flex = '1';
-
-        // Iterace přes data prezentací
-        data.forEach(presentation => {
-            const containerDiv = document.createElement('div');
-            containerDiv.style.display = 'flex';
-            containerDiv.style.alignItems = 'center';
-            containerDiv.style.marginBottom = '10px';
-            containerDiv.style.cursor = 'pointer';
-
-            const text = document.createElement('p');
-            text.innerHTML = `${count}`;
-            text.style.marginRight = '10px';
-            text.style.fontWeight = 'bold';
-
-            const wrapperDiv = document.createElement('div');
-            wrapperDiv.className = "presentation";
-
-            // Prezentace - řádky
-            const row1 = document.createElement('tr');
-            row1.innerHTML = `<td colspan="2" style="font-weight: bold;">${presentation.title}</td>`;
-            row1.style.paddingBottom = '10vw';
-            wrapperDiv.appendChild(row1);
-
-            const row2 = document.createElement('tr');
-            row2.innerHTML = `<td>${new Date(presentation.start_time).toLocaleDateString()} - ${new Date(presentation.end_time).toLocaleDateString()}</td><td>${new Date(presentation.start_time).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>-<td>${new Date(presentation.end_time).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>`;
-            wrapperDiv.appendChild(row2);
-
-            containerDiv.appendChild(text);
-            containerDiv.appendChild(wrapperDiv);
-
-            if (count % 2 !== 0) {
-                leftColumn.appendChild(containerDiv);
-            } else {
-                rightColumn.appendChild(containerDiv);
-            }
-
-            count++;
-        });
-
-        mainContainer.appendChild(leftColumn);
-        mainContainer.appendChild(rightColumn);
-        tableBody.appendChild(mainContainer);
-        //tableBody.appendChild(mainContainer);
-
-    });*/
 </script>
 
 </body>

@@ -120,12 +120,13 @@ fetch('get_conferences.php')
             wrapperDiv.className = "conference";
 
             const row1 = document.createElement('tr');
-            row1.innerHTML = `<td colspan="2" style="font-weight: bold;">${conference.name}</td>`;
+            row1.innerHTML = `<td style="font-weight: bold;">${conference.name}</td>`;
             row1.style.paddingBottom = '10vw';
             wrapperDiv.appendChild(row1);
 
             const row2 = document.createElement('tr');
-            row2.innerHTML = `<td>${new Date(conference.start_datetime).toLocaleDateString()} - ${new Date(conference.end_datetime).toLocaleDateString()}</td><td>${new Date(conference.start_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>-<td>${new Date(conference.end_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>`;
+            row2.innerHTML = `<td>${new Date(conference.start_datetime).toLocaleDateString()} - ${new Date(conference.end_datetime).toLocaleDateString()} <p style="margin: 0; display: inline-block; margin-left: 20px;">${new Date(conference.start_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })} - ${new Date(conference.end_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</p></td>`;
+            
             wrapperDiv.appendChild(row2);
 
             containerDiv.appendChild(text);

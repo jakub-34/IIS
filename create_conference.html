@@ -12,22 +12,6 @@
             border: 2px solid red;
         }
     </style>
-    <script>
-        // Check if the user is logged in and has the admin role
-        fetch('check_session.php')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.isLoggedIn) {
-                    // Redirect to the main page
-                    window.location.href = 'index.html';
-                }
-            })
-            .catch(error => {
-                console.error('Error checking session:', error);
-                // Redirect to the main page in case of an error
-                window.location.href = 'index.html';
-            });
-    </script>
 </head>
 <body>
 
@@ -48,7 +32,7 @@
     </div>
 
     <div class="body">
-        <form action="create_conference.php" method="POST" style="max-width: 450px; margin: auto; padding: 2vw 4vw 4vw 2vw; background-color: #DEDEDE; border-radius: 15px;">
+        <form action="create_conference.php" method="POST" id="conferenceForm" style="max-width: 450px; margin: auto; padding: 2vw 4vw 4vw 2vw; background-color: #DEDEDE; border-radius: 15px;">
             <h2>New Conference</h2>
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
@@ -81,17 +65,31 @@
     </div>
 
     <script>
+
+    // Check if the user is logged in and has the admin role
+    fetch('check_session.php')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.isLoggedIn) {
+                // Redirect to the main page
+                window.location.href = 'index.html';
+            }
+        })
+        .catch(error => {
+            console.error('Error checking session:', error);
+            // Redirect to the main page in case of an error
+            window.location.href = 'index.html';
+        });
+
     fetch('check_session.php')
         .then(response => response.json())
         .then(data => {
             const loginLogoutButton = document.getElementById('loginLogoutButton');
             const adminPageButton = document.getElementById('adminPageButton');
-            const conferenceButton = document.getElementById('create_conference');
         
             if (data.isLoggedIn) {
                 loginLogoutButton.textContent = 'Logout';
                 loginLogoutButton.href = 'logout.php';
-                conferenceButton.style.display = 'flex'
             
                 if (data.role === 'admin') {
                     adminPageButton.style.display = 'inline-block';
@@ -119,6 +117,21 @@
                 }
         })
         .catch(error => console.error('Error checking session:', error));
+        // Zajistí, že se skript spustí až po načtení DOM
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("conferenceForm");
+            console.log("asdas");
+            form.addEventListener("submit", function(event) {
+                const startDateTime = document.getElementById("start_datetime").value;
+                const endDateTime = document.getElementById("end_datetime").value;
+
+                // Validace: End musí být větší než Start
+                if (new Date(endDateTime) <= new Date(startDateTime)) {
+                    alert("End datetime must be greater than start datetime.");
+                    event.preventDefault(); // Zrušení odeslání formuláře
+                }
+            });
+        });
     </script>
 
 </body>
