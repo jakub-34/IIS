@@ -10,17 +10,11 @@ if (isset($_SESSION['user_id']) && isset($_GET['conference_id'])) {
     $status = 'pending';
 
     $sql_capacity = "
-        SELECT 
-            c.capacity - IFNULL(SUM(r.tickets_count), 0) AS remaining_capacity
-        FROM 
-            conferences c
-        LEFT JOIN 
-            reservations r ON r.conference_id = c.conference_id AND r.status != 'cancelled'
-        WHERE 
-            c.conference_id = ?
-        GROUP BY 
-            c.conference_id
-    ";
+        SELECT c.capacity - IFNULL(SUM(r.tickets_count), 0) AS remaining_capacity
+        FROM conferences c
+        LEFT JOIN reservations r ON r.conference_id = c.conference_id AND r.status != 'cancelled'
+        WHERE c.conference_id = ?
+        GROUP BY c.conference_id";
 
     $stmt = $conn->prepare($sql_capacity);
     if (!$stmt) {
@@ -37,7 +31,8 @@ if (isset($_SESSION['user_id']) && isset($_GET['conference_id'])) {
             header('Location: conference_details.php?conference_id=' . $conferenceId . '&error=no_tickets');
             exit;
         }
-    } else {
+    } 
+    else {
         header('Location: conference_details.php?conference_id=' . $conferenceId . '&error=not_found');
         exit;
     }
