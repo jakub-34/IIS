@@ -69,6 +69,96 @@
                     reservationLink.href = `manage_reservations.html?id=${conferenceId}`;
                 }
             })
+<<<<<<< HEAD
+=======
+            .catch(error => console.error('Chyba při kontrole přihlášení:', error));
+    }
+// Načtení stavu přihlášení po otevření stránky
+checkLoginStatus();
+
+
+// Načtení prezentací z PHP skriptu
+fetch(`conference_details.php?conference_id=${conferenceId}`)
+    .then(response => response.json())
+    .then(data => {
+        var count = 1;
+        const tableBody = document.getElementById('presentationTable');
+
+        const conferenceDetails = data.conference_details;
+        const capacityInfo = data.capacity_info;
+
+        const conferenceInfoContainer = document.createElement('div');
+        conferenceInfoContainer.style.display = 'flex'; 
+        conferenceInfoContainer.style.justifyContent = 'space-between';
+        conferenceInfoContainer.style.alignItems = 'flex-start';
+        conferenceInfoContainer.style.marginBottom = '20px';
+        conferenceInfoContainer.style.padding = '15px';
+        conferenceInfoContainer.style.border = '1px solid #ccc';
+        conferenceInfoContainer.style.borderRadius = '8px';
+        conferenceInfoContainer.style.backgroundColor = '#f9f9f9';
+        conferenceInfoContainer.style.position = 'relative';
+        conferenceInfoContainer.style.height = 'auto';
+
+        const leftColumnC = document.createElement('div');
+        leftColumnC.style.flex = '1'; 
+        leftColumnC.style.marginRight = '20px';
+
+        const title = document.createElement('h2');
+        title.textContent = conferenceDetails.name;
+        title.style.color = 'black';
+        title.style.marginBottom = '0px';
+
+        const description = document.createElement('p');
+        description.textContent = conferenceDetails.description;
+        description.style.marginBottom = '30px';
+        description.style.marginLeft = '20px';
+        description.style.marginTop = '0px';
+
+        const details = document.createElement('p');
+        details.innerHTML = `
+            <strong>Location:</strong> ${conferenceDetails.location}<br>
+            <strong>Date-time:</strong> 
+                ${new Date(conferenceDetails.start_datetime).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' })} 
+                ${new Date(conferenceDetails.start_datetime).toLocaleDateString('cs-CZ')} - 
+                ${new Date(conferenceDetails.end_datetime).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' })} 
+                ${new Date(conferenceDetails.end_datetime).toLocaleDateString('cs-CZ')}<br>
+            <strong>Capacity:</strong> ${capacityInfo.remaining_capacity}/${capacityInfo.total_capacity} <br>
+            <strong>Genre:</strong> ${conferenceDetails.genre}
+        `;
+        details.style.marginLeft = '20px';
+        details.style.bottom = '30px';
+
+        leftColumnC.appendChild(title);
+        leftColumnC.appendChild(description);
+        leftColumnC.appendChild(details);
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.position = 'absolute';
+        buttonContainer.style.bottom = '30px';
+        buttonContainer.style.right = '30px'; 
+
+        const reserveTicketButton = document.createElement('a');
+        reserveTicketButton.id = 'reserve_ticket_button';
+        reserveTicketButton.textContent = 'Reserve Ticket';
+        reserveTicketButton.style.display = 'inline-block';
+        reserveTicketButton.style.color = 'black';
+        reserveTicketButton.style.backgroundColor = '#fff';
+        reserveTicketButton.style.padding = '10px 20px';
+        reserveTicketButton.style.borderRadius = '5px';
+        reserveTicketButton.style.border = '2px solid #000';
+        reserveTicketButton.style.textDecoration = 'none';
+        reserveTicketButton.style.fontWeight = 'bold';
+
+        if (capacityInfo.remaining_capacity <= 0) {
+            reserveTicketButton.textContent = 'Sold Out';
+            reserveTicketButton.classList.add('sold-out');
+            reserveTicketButton.style.pointerEvents = 'none';
+        } else {
+            reserveTicketButton.textContent = 'Reserve Ticket';
+            reserveTicketButton.href = isLoggedIn
+                ? `create_reservation.php?conference_id=${conferenceId}`
+                : `reserve_tickets.html?conference_id=${conferenceId}`;
+>>>>>>> ac82899353b0d9e848ed1cab9531fb2e5ec46783
         }
         loadUserData();
         setConferenceLink();

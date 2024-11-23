@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $stmt = $conn->prepare($sql_capacity);
     if (!$stmt) {
-        echo "Error preparing statement";
+        echo json_encode(['success' => false, 'error' => 'Error preparing statement']);
         exit;
     }
 
@@ -58,8 +58,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Add new user into database
     $stmt = $conn->prepare("INSERT INTO users (name, lastname, role) VALUES (?, ?, 'guest')");
     $stmt->bind_param("ss", $name, $lastname);
-    $stmt->execute();
-    $user_id = $conn->insert_id; 
+    if ($stmt->execute()) {
+        $user_id = $conn->insert_id; 
+    } else {
+        echo json_encode(['success' => false, 'error' => 'Error creating user.']);
+        exit;
+    }
     $stmt->close();
 
     // Reservation creation part
@@ -68,10 +72,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Execute the reservation query
     if ($stmt->execute()) {
-        header("Location: index.html?conference_id=$conference_id&status=success");
+        echo json_encode(['success' => true, 'message' => 'Reservation successful.']);
         exit;
     } else {
-        header("Location: index.html?conference_id=$conference_id&status=error");
+        echo json_encode(['success' => false, 'error' => 'Error creating reservation.']);
         exit;
     }
 
