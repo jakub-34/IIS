@@ -56,28 +56,23 @@
     </div>
 
     <div class="body">
-        <form action="register.php" method="POST" onsubmit="return validateForm()" style="max-width: 450px; margin: auto; padding: 2vw 4vw 4vw 2vw; background-color: #DEDEDE; border-radius: 15px;">
-            <h2>Registration</h2>
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
-
-            <label for="lastname">Surname:</label>
-            <input type="text" id="lastname" name="lastname" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
-
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;" oninput="checkUsername()">
-            <p id="usernameError" style="color: red; display: none;">Username already exists</p>
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
-
-            <label for="confirm_password">Password:</label>
-            <input type="password" id="confirm_password" name="confirm_password" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
-
-            <div style="display: flex; justify-content: center; margin-top: 2vw;">
-                <button type="submit" class="login-button" style="width: 100%; max-width: 200px;">Register</button>
-            </div>
+        <form id="registerForm" class="form-container" method="POST" action="register.php" onsubmit="return validateForm()">
+            <h2 style="color: black;">Registration</h2>
+            
+            <input type="text" id="name" name="name" placeholder="Name" required>
+            
+            <input type="text" id="lastname" name="lastname" placeholder="Surname" required>
+            
+            <input type="text" id="username" name="username" placeholder="Username" required oninput="checkUsername()">
+            <p id="usernameError" class="error-message" style="display: none;">Username already exists</p>
+            
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+            
+            <button type="submit" class="register-button">Register</button>
         </form>
+        
     </div>
 
     <script>

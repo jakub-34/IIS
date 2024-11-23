@@ -141,6 +141,7 @@ h2 a
 .form-container input[type="datetime-local"],
 .form-container input[type="text"],
 .form-container input[type="url"],
+.form-container input[type="password"],
 .form-container textarea,
 .form-container input[type="number"] {
     font-family: Arial, sans-serif; 
@@ -153,6 +154,21 @@ h2 a
     height: 30px;
     border-radius: 10px;
     resize: vertical;
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.form-footer a {
+    font-size: 0.9em;
+    text-decoration: none;
+    color: #333;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
 }
 
 .presentation label {
@@ -168,7 +184,7 @@ h2 a
     cursor: pointer;
 }
 
-.add-conference-button {
+.add-conference-button, .register-button, .login-button2 {
     padding: 10px;
     margin-top: 10px;
     background-color: #ccc;

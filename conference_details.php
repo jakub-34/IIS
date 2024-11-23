@@ -42,7 +42,7 @@ $sql_presentations = "SELECT
     FROM presentations p
     LEFT JOIN users u ON p.speaker_id = u.user_id
     WHERE p.conference_id = $conference_id AND status = 'approved'
-    ORDER BY p.start_time ASC";
+    ORDER BY p.date ASC, p.start_time ASC";
 $result_presentations = $conn->query($sql_presentations);
 
 // Převedení výsledků do JSON formátu pro prezentace

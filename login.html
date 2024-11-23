@@ -36,21 +36,19 @@
     </div>
 
     <div class="body">
-        <form action="login.php" method="POST" style="max-width: 450px; margin: auto; padding: 2vw 4vw 4vw 2vw; background-color: #DEDEDE; border-radius: 15px;">
-            <h2>Login</h2>
+        <form id="loginForm" class="form-container" method="POST" action="login.php">
+            <h2 style="color: black;">Login</h2>
+            
             <input type="hidden" id="previousPage" name="previousPage" value="">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
             
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required style="width: 100%; padding: 1vw; margin-top: 0.5vw; box-sizing: border-box; height: 2.5vw;">
+            <input type="text" id="username" name="username" placeholder="Username" required>
             
-            <div style="display: flex; justify-content: center; margin-top: 2vw;">
-                <button type="submit" class="login-button" style="width: 100%; max-width: 200px;">Login</button>
-            </div>
+            <input type="password" id="password" name="password" placeholder="Password" required>
             
-            <div style="text-align: center; margin-top: 1vw;">
-                <a href="register.html" style="font-size: 0.9em; text-decoration: none;">Register</a>
+            <button type="submit" class="login-button2">Login</button>
+            
+            <div class="form-footer">
+                <a href="register.html">Register</a>
             </div>
         </form>
         <script>
