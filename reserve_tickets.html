@@ -59,38 +59,54 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const form = document.querySelector("form");
-    
-            form.addEventListener("submit", async function (event) {
-                event.preventDefault(); // Zabráň odoslaniu formulára klasickým spôsobom
-    
-                const formData = new FormData(form);
-                const conferenceId = new URLSearchParams(window.location.search).get("conference_id");
-    
-                try {
-                    const response = await fetch(`reserve_tickets.php?conference_id=${conferenceId}`, {
-                        method: "POST",
-                        body: formData,
-                    });
-    
-                    const result = await response.json();
-    
-                    if (result.success) {
-                        // Ak je rezervácia úspešná, presmeruj používateľa
-                        alert("Reservation successful!");
-                        window.location.href = `index.html?conference_id=${conferenceId}&status=success`;
-                    } else {
-                        // Zobraz chybu, ak nie sú dostupné vstupenky
-                        alert(result.error || "An error occurred during reservation.");
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                    alert("An unexpected error occurred. Please try again later.");
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+        const registerLink = document.getElementById('registerLink');
+
+        // Event listener for form submission
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault(); 
+
+            const formData = new FormData(form);
+            const conferenceId = new URLSearchParams(window.location.search).get("conference_id");
+
+            try {
+                const response = await fetch(`reserve_tickets.php?conference_id=${conferenceId}`, {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert("Reservation successful!");
+                    window.location.href = `index.html`;
+                } else {
+                    alert(result.error || "An error occurred during reservation.");
                 }
-            });
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An unexpected error occurred. Please try again later.");
+            }
         });
-    </script>
+
+        // Event listener for register link click
+        registerLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const lastname = document.getElementById('lastname').value;
+
+            let registerUrl = `register.html`;
+
+            if (name && lastname) {
+                registerUrl += `?name=${encodeURIComponent(name)}&lastname=${encodeURIComponent(lastname)}`;
+            }
+
+            window.location.href = registerUrl;
+        });
+    });
+</script>
+
     
 
 </body>

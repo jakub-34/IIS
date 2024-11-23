@@ -179,7 +179,6 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
 
         const reserveTicketButton = document.createElement('a');
         reserveTicketButton.id = 'reserve_ticket_button';
-        reserveTicketButton.href = `reserve_tickets.html?conference_id=${conferenceDetails.conference_id}`;
         reserveTicketButton.textContent = 'Reserve Ticket';
         reserveTicketButton.style.display = 'inline-block';
         reserveTicketButton.style.color = 'black';
@@ -190,11 +189,15 @@ fetch(`conference_details.php?conference_id=${conferenceId}`)
         reserveTicketButton.style.textDecoration = 'none';
         reserveTicketButton.style.fontWeight = 'bold';
 
-        if (isLoggedIn) {
-            reserveTicketButton.href = `create_reservation.php?conference_id=${conferenceId}`;
-        } 
-        else {
-            reserveTicketButton.href = `reserve_tickets.html?conference_id=${conferenceId}`;
+        if (capacityInfo.remaining_capacity <= 0) {
+            reserveTicketButton.textContent = 'Sold Out';
+            reserveTicketButton.classList.add('sold-out');
+            reserveTicketButton.style.pointerEvents = 'none';
+        } else {
+            reserveTicketButton.textContent = 'Reserve Ticket';
+            reserveTicketButton.href = isLoggedIn
+                ? `create_reservation.php?conference_id=${conferenceId}`
+                : `reserve_tickets.html?conference_id=${conferenceId}`;
         }
 
         reserveTicketButton.addEventListener('mouseover', function() {
