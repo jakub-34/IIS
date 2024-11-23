@@ -29,14 +29,10 @@ $sql_capacity = "
         c.capacity AS total_capacity,
         IFNULL(SUM(r.tickets_count), 0) AS reserved_tickets,
         (SELECT tickets_count FROM reservations WHERE reservation_id = ?) AS user_tickets
-    FROM 
-        conferences c
-    LEFT JOIN 
-        reservations r ON r.conference_id = c.conference_id AND r.status != 'cancelled'
-    WHERE 
-        c.conference_id = (SELECT conference_id FROM reservations WHERE reservation_id = ?)
-    GROUP BY 
-        c.conference_id
+    FROM conferences c
+    LEFT JOIN reservations r ON r.conference_id = c.conference_id AND r.status != 'cancelled'
+    WHERE c.conference_id = (SELECT conference_id FROM reservations WHERE reservation_id = ?)
+    GROUP BY c.conference_id
 ";
 
 $stmt = $conn->prepare($sql_capacity);
@@ -56,7 +52,8 @@ if ($stmt->fetch()) {
         'reserved_tickets' => $reserved_tickets,
         'user_tickets' => $user_tickets,
     ];
-} else {
+} 
+else {
     echo json_encode(['success' => false, 'error' => 'Conference not found.']);
     exit;
 }
@@ -85,7 +82,8 @@ if (!$stmt_update) {
 $stmt_update->bind_param("iii", $newTicketCount, $reservationId, $userId);
 if ($stmt_update->execute()) {
     echo json_encode(['success' => true]);
-} else {
+} 
+else {
     echo json_encode(['success' => false, 'error' => 'Failed to update ticket count.']);
 }
 

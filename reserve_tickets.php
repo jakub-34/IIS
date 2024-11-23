@@ -9,21 +9,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $lastname = $_POST['lastname'];
     $tickets_count = $_POST['tickets_count'];
-    $status = $_POST['payment_status']; // Assuming this is passed in the form
+    $status = $_POST['payment_status'];
 
     // Fetch the total capacity and the already reserved tickets for the conference
     $sql_capacity = "
         SELECT 
             c.capacity AS total_capacity,
             IFNULL(SUM(r.tickets_count), 0) AS reserved_tickets
-        FROM 
-            conferences c
-        LEFT JOIN 
-            reservations r ON r.conference_id = c.conference_id AND r.status != 'cancelled'
-        WHERE 
-            c.conference_id = ?
-        GROUP BY 
-            c.conference_id
+        FROM conferences c
+        LEFT JOIN reservations r ON r.conference_id = c.conference_id AND r.status != 'cancelled'
+        WHERE c.conference_id = ?
+        GROUP BY c.conference_id
     ";
 
     $stmt = $conn->prepare($sql_capacity);
@@ -39,7 +35,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($stmt->fetch()) {
         $remaining_capacity = $total_capacity - $reserved_tickets;
-    } else {
+    } 
+    else {
         echo json_encode(['success' => false, 'error' => 'Conference not found.']);
         exit;
     }
@@ -60,7 +57,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("ss", $name, $lastname);
     if ($stmt->execute()) {
         $user_id = $conn->insert_id; 
-    } else {
+    } 
+    else {
         echo json_encode(['success' => false, 'error' => 'Error creating user.']);
         exit;
     }
@@ -74,7 +72,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Reservation successful.']);
         exit;
-    } else {
+    } 
+    else {
         echo json_encode(['success' => false, 'error' => 'Error creating reservation.']);
         exit;
     }

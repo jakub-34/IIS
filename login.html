@@ -6,22 +6,6 @@
     <title>Login</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script>
-        // Check if the user is logged in and has the admin role
-        fetch('check_session.php')
-            .then(response => response.json())
-            .then(data => {
-                if (data.isLoggedIn) {
-                    // Redirect to the main page
-                    window.location.href = 'index.html';
-                }
-            })
-            .catch(error => {
-                console.error('Error checking session:', error);
-                // Redirect to the main page in case of an error
-                window.location.href = 'index.html';
-            });
-    </script>
 </head>
 <body>
 
@@ -29,14 +13,14 @@
         <h2 style="float: left;">
             <a href="index.html" style="text-decoration: none; color: inherit;">
                 <i class="fas fa-home" style="margin-right: 5px;"></i>
-                Login
             </a>
+            <a href="#">Login</a>
         </h2>
         <a href="login.html" class="login-button">Login</a>
     </div>
 
     <div class="body">
-        <form id="loginForm" class="form-container" method="POST" action="login.php">
+        <form id="loginForm" class="form-container" method="POST" action="backend/login.php">
             <h2 style="color: black;">Login</h2>
             
             <input type="hidden" id="previousPage" name="previousPage" value="">
@@ -52,6 +36,18 @@
             </div>
         </form>
         <script>
+            // Check if the user is logged in and
+            fetch('backend/check_session.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.isLoggedIn) {
+                        window.location.href = 'index.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking session:', error);
+                    window.location.href = 'index.html';
+                });
             // Set the previous page URL in the hidden input
             document.getElementById('previousPage').value = document.referrer || 'index.html';
         </script>

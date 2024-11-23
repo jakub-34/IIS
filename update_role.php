@@ -1,7 +1,6 @@
 <?php
-include 'db_config.php'; // Connect to database
+include 'db_config.php';
 
-// Get request data
 $input = json_decode(file_get_contents('php://input'), true);
 $user_id = $input['user_id'];
 $new_role = $input['role'];
@@ -18,7 +17,8 @@ $stmt->bind_param("si", $new_role, $user_id);
 
 if ($stmt->execute()) {
     echo json_encode(['success' => true]);
-} else {
+} 
+else {
     echo json_encode(['success' => false, 'error' => $stmt->error]);
 }
 

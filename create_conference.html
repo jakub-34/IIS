@@ -22,7 +22,7 @@
     </div>
 
     <div class="body">
-        <form id="conferenceForm" class="form-container" method="POST" action="create_conference.php">
+        <form id="conferenceForm" class="form-container" method="POST" action="backend/create_conference.php">
             <h2 style="color: black;">New Conference</h2>
             
             <input type="text" id="name" name="name" placeholder="Name" required>
@@ -49,7 +49,7 @@
     <script>
 
     // Check if the user is logged in and has the admin role
-    fetch('check_session.php')
+    fetch('backend/check_session.php')
         .then(response => response.json())
         .then(data => {
             if (!data.isLoggedIn) {
@@ -60,7 +60,7 @@
         
             if (data.isLoggedIn) {
                 loginLogoutButton.textContent = 'Logout';
-                loginLogoutButton.href = 'logout.php';
+                loginLogoutButton.href = 'backend/logout.php';
             
             } 
             else {

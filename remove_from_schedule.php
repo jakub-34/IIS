@@ -17,7 +17,8 @@ $stmt->bind_param("ii", $user_id, $presentation_id);
 
 if ($stmt->execute()) {
     echo json_encode(['success' => true]);
-} else {
+} 
+else {
     echo json_encode(['success' => false, 'error' => 'Database error.']);
 }
 $stmt->close();

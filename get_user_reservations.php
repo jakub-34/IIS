@@ -29,7 +29,6 @@ if (!$stmt) {
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 
-// Použitie bind_result() namiesto get_result()
 $stmt->bind_result($reservationId, $conferenceName, $ticketsCount, $status);
 
 $reservations = [];

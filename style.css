@@ -67,6 +67,10 @@ h2 a
     background-color: #92292d;
 }
 
+.error-border {
+    border: 2px solid red;
+}
+
 .conference, .presentation
 {
     width: 80%;
@@ -143,11 +147,11 @@ h2 a
 .form-container input[type="url"],
 .form-container input[type="password"],
 .form-container textarea,
+.form-container select,
 .form-container input[type="number"] {
     font-family: Arial, sans-serif; 
     padding: 10px;
     margin: 5px 0;
-    /*background-color: #ddd;*/
     background-color: white;
     border: none;
     font-size: 16px;

@@ -18,8 +18,7 @@ if (isset($_POST['title'], $_POST['description'])) {
     $title = $_POST['title'];
     $description = $_POST['description'];
 
-    $sql = "INSERT INTO presentations (conference_id, title, speaker_id, description, status) 
-            VALUES (?, ?, ?, ?, 'not_approved')";
+    $sql = "INSERT INTO presentations (conference_id, title, speaker_id, description, status) VALUES (?, ?, ?, ?, 'not_approved')";
 
     if ($stmt = $conn->prepare($sql)) {
         $stmt->bind_param("isss", $conference_id, $title, $speaker_id, $description);

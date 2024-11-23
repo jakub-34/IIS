@@ -6,22 +6,6 @@
     <title>My reservation</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script>
-        // Check if the user is logged in and has the admin role
-        fetch('check_session.php')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.isLoggedIn) {
-                    // Redirect to the main page if not logged in
-                    window.location.href = 'index.html';
-                }
-            })
-            .catch(error => {
-                console.error('Error checking session:', error);
-                // Redirect to the main page in case of an error
-                window.location.href = 'index.html';
-            });
-    </script>
 </head>
 <body>
 
@@ -29,11 +13,11 @@
         <h2 style="float: left;">
             <a href="index.html" style="text-decoration: none; color: inherit;">
                 <i class="fas fa-home" style="margin-right: 5px;"></i>
-                My Reservations
             </a>
+            <a href="#">My Reservations</a>
         </h2>
         <div style="float: right;">
-            <a href="logout.php" id="loginLogoutButton" class="login-button">Logout</a>
+            <a href="backend/logout.php" id="loginLogoutButton" class="login-button">Logout</a>
         </div>
     </div>
 
@@ -46,7 +30,7 @@
                         <th>Conference Name</th>
                         <th>Tickets Count</th>
                         <th>Status</th>
-                        <th>Action</th>
+                        <th style="text-align: center;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,9 +40,22 @@
     </div>
 
     <script>
+        // Check if the user is logged in and has the admin role
+        fetch('backend/check_session.php')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.isLoggedIn) {
+                    window.location.href = 'index.html';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking session:', error);
+                window.location.href = 'index.html';
+            });
+
         // Function to load the user's reservations
         function loadReservations() {
-            fetch('get_user_reservations.php')
+            fetch('backend/get_user_reservations.php')
             .then(response => response.json())
             .then(data => {
                 const reservationsTable = document.getElementById('reservationsTable');
@@ -68,7 +65,8 @@
                 if (data.length === 0) {
                     emptyReservations.style.display = 'block';
                     reservationsTable.style.display = 'none';
-                } else {
+                } 
+                else {
                     emptyReservations.style.display = 'none';
                     reservationsTable.style.display = 'table';
 
@@ -82,24 +80,27 @@
                         const isPaid = reservation.status === 'paid';
 
                         row.innerHTML = `
-                            <td>${reservation.conference_name}</td>
-                            <td>
-                                <input type="number" class="ticket-input" data-reservation-id="${reservation.reservation_id}" value="${reservation.tickets_count}" min="1"  ${isPaid ? 'disabled' : ''}>
-                                <button class="confirm-button" data-reservation-id="${reservation.reservation_id}" ${isPaid ? 'disabled' : ''}>Confirm</button>
+                            <td style="padding-left: 1vw;">${reservation.conference_name}</td>
+                            <td style="padding-left: 1vw;">
+                                <input type="number" class="ticket-input" id="${reservation.reservation_id}" data-reservation-id="${reservation.reservation_id}" value="${reservation.tickets_count}" min="1"  ${isPaid ? 'disabled' : ''}>
                             </td>
-                            <td>${reservation.status}</td>
-                            <td>
+                            <td style="padding-left: 1vw;">${reservation.status}</td>
+                            <td style="justify-items: center;">
                                 <div >
-                                    <button class="pay-button" data-reservation-id="${reservation.reservation_id}" style="background-color: #4CAF50; color: white; border: none; padding: 5px 10px; cursor: pointer; ${isPaid ? 'background-color: #B0BEC5; cursor: not-allowed;' : ''}" ${isPaid ? 'disabled' : ''}>Pay</button>
                                     <button class="delete-button" data-reservation-id="${reservation.reservation_id}" style="background-color: #F44336; color: white; border: none; padding: 5px 10px; cursor: pointer; ${isPaid ? 'background-color: #B0BEC5; cursor: not-allowed;' : ''}" ${isPaid ? 'disabled' : ''}>Delete</button>
+                                    <button class="pay-button" data-reservation-id="${reservation.reservation_id}" style="background-color: #4CAF50; color: white; border: none; padding: 5px 10px; cursor: pointer; ${isPaid ? 'background-color: #B0BEC5; cursor: not-allowed;' : ''}" ${isPaid ? 'disabled' : ''}>Pay</button>
                                 </div>
                             </td>
                         `;
-                            const confirmButton = row.querySelector('.confirm-button');
-                            confirmButton.addEventListener('click', () => {
-                                const reservationId = confirmButton.getAttribute('data-reservation-id');
+                            const id = row.querySelector(`[data-reservation-id="${reservation.reservation_id}"]`);
+                            id.addEventListener('change', () => {
                                 const newTicketCount = row.querySelector('.ticket-input').value;
-                                updateTicketCount(reservationId, newTicketCount);
+                                if (newTicketCount > 0) {
+                                    updateTicketCount(reservation.reservation_id, newTicketCount);
+                                }
+                                else {
+                                    alert("Ticket count must be greater then 0");
+                                }
                             });
 
                             const deleteButton = row.querySelector('.delete-button');
@@ -130,7 +131,7 @@
 
 
         function updateTicketCount(reservationId, newTicketCount) {
-            fetch('update_ticket_count.php', {
+            fetch('backend/update_ticket_count.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -141,7 +142,8 @@
             .then(data => {
                 if (data.success) {
                     loadReservations(); 
-                } else {
+                } 
+                else {
                     alert(data.error || 'Failed to update ticket count.');
                     loadReservations();
                 }
@@ -150,7 +152,7 @@
 
         // Function to remove a reservation
         function removeReservation(reservationId) {
-            fetch('remove_from_reservations.php', {
+            fetch('backend/remove_from_reservations.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -167,7 +169,7 @@
 
         // Function to process payment
         function processPayment(reservationId) {
-            fetch('pay_for_reservation.php', {
+            fetch('backend/pay_for_reservation.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

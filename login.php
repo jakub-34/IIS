@@ -1,5 +1,5 @@
 <?php
-include 'db_config.php'; // Connection configuration
+include 'db_config.php';
 
 session_start();
 
@@ -23,10 +23,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             header("Location: $previousPage");
             exit;
-        } else {
+        } 
+        else {
             echo "<script>alert('Wrong username or password.'); window.location.href='login.html';</script>";
         }
-    } else {
+    } 
+    else {
         echo "<script>alert('Wrong username or password.'); window.location.href='login.html';</script>";
     }
 

@@ -1,8 +1,8 @@
 <?php
 session_start();
-include 'db_config.php'; // Připojení k databázi
+include 'db_config.php';
 
-// Zkontrolujte, zda je uživatel přihlášen
+// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
     header('Content-Type: application/json');
     echo json_encode(['error' => 'User not logged in.']);
@@ -11,7 +11,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Dotaz na databázi
 $query = "
     SELECT
         p.presentation_id, 
@@ -23,7 +22,7 @@ $query = "
         p.room_name
     FROM user_presentation up
     JOIN presentations p ON up.presentation_id = p.presentation_id
-    WHERE up.user_id = ?
+    WHERE up.user_id = ? AND p.status = 'approved'
     ORDER BY p.date ASC, p.start_time ASC
 ";
 

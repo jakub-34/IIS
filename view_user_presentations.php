@@ -1,5 +1,5 @@
 <?php
-include 'db_config.php'; // Připojení k databázi
+include 'db_config.php';
 
 $query = "SELECT * FROM user_presentation";
 
@@ -7,9 +7,10 @@ $result = $conn->query($query);
 
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        print_r($row); // Výpis řádků do terminálu
+        print_r($row);
     }
-} else {
+} 
+else {
     echo "Tabulka user_presentation je prázdná.";
 }
 

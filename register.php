@@ -1,5 +1,5 @@
 <?php
-include 'db_config.php'; // Connection to database
+include 'db_config.php';
 
 session_start();
 
@@ -22,9 +22,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['username'] = $username;
         $_SESSION['role'] = 'registered';
 
-        header("Location: index.html"); // Go to index.html
+        header("Location: index.html");
         exit;
-    } else {
+    } 
+    else {
         echo "<script>alert('There has been unexpected error in registration'); window.location.href='register.html';</script>";
     }
     

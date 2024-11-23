@@ -11,7 +11,8 @@ $sql = "INSERT INTO users (name, lastname, username, password, role)
 // Spuštění dotazu
 if ($conn->query($sql) === TRUE) {
     echo "Admin byl úspěšně přidán.";
-} else {
+} 
+else {
     echo "Chyba při přidávání admina: " . $conn->error;
 }
 

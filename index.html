@@ -17,11 +17,9 @@
             </a>
         </h2>
         <div style="float: right;">
-            <!-- Tlačítko Login/Logout -->
             <a href="login.html" id="loginLogoutButton" class="login-button">Login</a>
             <a href="user_schedule.html" id="myScheduleButton" class="login-button" style="margin-right: 10px; display: none;">My Schedule</a>
             <a href="user_reservations.html" id="myReservationButton" class="login-button" style="margin-right: 10px; display: none;">My Reservation</a>
-            <!-- Dynamické tlačítko Admin Page -->
             <a href="admin_page.html" id="adminPageButton" class="login-button" style="display: none; margin-right: 10px;">Admin Page</a>
         </div>
     </div>
@@ -33,139 +31,130 @@
         </table>
     </div>
     
-    <a href="create_conference.html" class="fixed-button" id="create_conference" style="display: none;">
+    <a href="create_conference.html" class="fixed-button" id="create_conference" style="display: none;" title="Add conference">
         <i class="fas fa-plus"></i>
     </a>
 
 <script>
-// Funkce pro kontrolu stavu přihlášení
-function checkLoginStatus() {
-    fetch('check_session.php')
+    // Login status check function
+    function checkLoginStatus() {
+        fetch('backend/check_session.php')
+            .then(response => response.json())
+            .then(data => {
+                const loginLogoutButton = document.getElementById('loginLogoutButton');
+                const adminPageButton = document.getElementById('adminPageButton');
+                const conferenceButton = document.getElementById('create_conference');
+                const myScheduleButton = document.getElementById('myScheduleButton');
+                const myReservationButton = document.getElementById('myReservationButton');
+
+                if (data.isLoggedIn) {
+                    loginLogoutButton.textContent = 'Logout';
+                    loginLogoutButton.href = 'backend/logout.php';
+
+                    conferenceButton.style.display = 'flex';
+                    myScheduleButton.style.display = 'inline-block';
+                    myReservationButton.style.display = 'inline-block';
+
+                    if (data.role === 'admin') {
+                        adminPageButton.style.display = 'inline-block';
+                    }
+                } 
+                else {
+                    loginLogoutButton.textContent = 'Login';
+                    loginLogoutButton.href = 'login.html';
+
+                    conferenceButton.style.display = 'none';
+                    myScheduleButton.style.display = 'none';
+                    myReservationButton.style.display = 'none';
+                    adminPageButton.style.display = 'none';
+                }
+            })
+            .catch(error => {console.error('Error checking session:', error);});
+    }
+
+    // Check status from registartion
+    window.onload = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+            if (status === 'success') {
+                alert('Reservation made successfully!');
+            } 
+            else if (status === 'error') {
+                alert('Error creating reservation. Please try again.');
+            }
+    };
+
+    checkLoginStatus();
+
+    // Loading conferences
+    fetch('backend/get_conferences.php')
         .then(response => response.json())
         .then(data => {
-            const loginLogoutButton = document.getElementById('loginLogoutButton');
-            const adminPageButton = document.getElementById('adminPageButton');
-            const conferenceButton = document.getElementById('create_conference');
+            var count = 1;
+            const tableBody = document.getElementById('conferenceTable');
 
-            if (data.isLoggedIn) {
-                loginLogoutButton.textContent = 'Logout';
-                loginLogoutButton.href = 'logout.php';
-                conferenceButton.style.display = 'flex'
+            // Main wrapper div for two columns
+            const mainContainer = document.createElement('div');
+            mainContainer.style.display = 'flex';        
+            mainContainer.style.justifyContent = 'space-between';
+            mainContainer.style.gap = '20px';            
 
-                if (data.role === 'admin') {
-                    adminPageButton.style.display = 'inline-block';
+            // Left and right column
+            const leftColumn = document.createElement('div');
+            leftColumn.style.flex = '1';
+
+            const rightColumn = document.createElement('div');
+            rightColumn.style.flex = '1';
+
+            // Iteration over conference dates
+            data.forEach(conference => {
+                const containerDiv = document.createElement('div');
+                containerDiv.style.display = 'flex';
+                containerDiv.style.alignItems = 'center';
+                containerDiv.style.marginBottom = '10px';
+                containerDiv.style.cursor = 'pointer';
+
+                containerDiv.onclick = () => {
+                    window.location.href = `conference_details.html?id=${conference.conference_id}`;
+                };
+
+                const text = document.createElement('p');
+                text.innerHTML = `${count}`;
+                text.style.marginRight = '10px';
+                text.style.fontWeight = 'bold';
+
+                const wrapperDiv = document.createElement('div');
+                wrapperDiv.className = "conference";
+
+                const row1 = document.createElement('tr');
+                row1.innerHTML = `<td style="font-weight: bold;">${conference.name}</td>`;
+                row1.style.paddingBottom = '10vw';
+                wrapperDiv.appendChild(row1);
+
+                const row2 = document.createElement('tr');
+                row2.innerHTML = `<td>${new Date(conference.start_datetime).toLocaleDateString()} - ${new Date(conference.end_datetime).toLocaleDateString()} <p style="margin: 0; display: inline-block; margin-left: 20px;">${new Date(conference.start_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })} - ${new Date(conference.end_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</p></td>`;
+                
+                wrapperDiv.appendChild(row2);
+
+                containerDiv.appendChild(text);
+                containerDiv.appendChild(wrapperDiv);
+
+                if (count % 2 !== 0) {
+                    leftColumn.appendChild(containerDiv);
+                } 
+                else {
+                    rightColumn.appendChild(containerDiv);
                 }
 
-            } else {
-                loginLogoutButton.textContent = 'Login';
-                loginLogoutButton.href = 'login.html';
-            }
+                count++;
+            });
+
+            mainContainer.appendChild(leftColumn);
+            mainContainer.appendChild(rightColumn);
+            tableBody.appendChild(mainContainer);
+
         })
-        .catch(error => console.error('Chyba při kontrole přihlášení:', error));
-}
-
-//check status from registartion
-window.onload = function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const status = urlParams.get('status');
-        if (status === 'success') {
-            alert('Reservation made successfully!');
-        } else if (status === 'error') {
-            alert('Error creating reservation. Please try again.');
-        }
-};
-        
-        
-// Načtení stavu přihlášení po otevření stránky
-checkLoginStatus();
-
-// Načtení konferencí z PHP skriptu
-fetch('get_conferences.php')
-    .then(response => response.json())
-    .then(data => {
-        var count = 1;
-        const tableBody = document.getElementById('conferenceTable');
-
-        // Hlavní obalovací div pro dva sloupce
-        const mainContainer = document.createElement('div');
-        mainContainer.style.display = 'flex';        
-        mainContainer.style.justifyContent = 'space-between';
-        mainContainer.style.gap = '20px';            
-
-        // Levý a pravý sloupec
-        const leftColumn = document.createElement('div');
-        leftColumn.style.flex = '1';
-
-        const rightColumn = document.createElement('div');
-        rightColumn.style.flex = '1';
-
-        // Iterace přes data konferencí
-        data.forEach(conference => {
-            const containerDiv = document.createElement('div');
-            containerDiv.style.display = 'flex';
-            containerDiv.style.alignItems = 'center';
-            containerDiv.style.marginBottom = '10px';
-            containerDiv.style.cursor = 'pointer';
-
-            containerDiv.onclick = () => {
-                window.location.href = `conference_details.html?id=${conference.conference_id}`;
-            };
-
-            const text = document.createElement('p');
-            text.innerHTML = `${count}`;
-            text.style.marginRight = '10px';
-            text.style.fontWeight = 'bold';
-
-            const wrapperDiv = document.createElement('div');
-            wrapperDiv.className = "conference";
-
-            const row1 = document.createElement('tr');
-            row1.innerHTML = `<td style="font-weight: bold;">${conference.name}</td>`;
-            row1.style.paddingBottom = '10vw';
-            wrapperDiv.appendChild(row1);
-
-            const row2 = document.createElement('tr');
-            row2.innerHTML = `<td>${new Date(conference.start_datetime).toLocaleDateString()} - ${new Date(conference.end_datetime).toLocaleDateString()} <p style="margin: 0; display: inline-block; margin-left: 20px;">${new Date(conference.start_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })} - ${new Date(conference.end_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</p></td>`;
-            
-            wrapperDiv.appendChild(row2);
-
-            containerDiv.appendChild(text);
-            containerDiv.appendChild(wrapperDiv);
-
-            if (count % 2 !== 0) {
-                leftColumn.appendChild(containerDiv);
-            } else {
-                rightColumn.appendChild(containerDiv);
-            }
-
-            count++;
-        });
-
-        mainContainer.appendChild(leftColumn);
-        mainContainer.appendChild(rightColumn);
-        tableBody.appendChild(mainContainer);
-
-    })
-    .catch(error => console.error('Chyba při načítání dat:', error));
-
-    // Check logged-in user role and display relevant buttons
-    fetch('check_session.php')
-        .then(response => response.json())
-        .then(data => {
-            const myScheduleButton = document.getElementById('myScheduleButton');
-            const myReservationButton = document.getElementById('myReservationButton');
-            const adminPageButton = document.getElementById('adminPageButton');
-
-            if (data.isLoggedIn) {
-                myScheduleButton.style.display = 'inline-block'; // Zobrazit tlačítko My Schedule
-                myReservationButton.style.display = 'inline-block';
-                if (data.role === 'admin') {
-                    adminPageButton.style.display = 'inline-block'; // Zobrazit tlačítko Admin Page
-                }
-            }
-    })
-    .catch(error => console.error('Error checking session:', error));
-
+        .catch(error => console.error('Chyba při načítání dat:', error));
 </script>
 
 </body>

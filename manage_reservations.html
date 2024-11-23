@@ -6,22 +6,6 @@
     <title>Manage Reservations</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script>
-        // Check if the user is logged in and has the admin role
-        fetch('check_session.php')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.isLoggedIn) {
-                    // Redirect to the main page
-                    window.location.href = 'index.html';
-                }
-            })
-            .catch(error => {
-                console.error('Error checking session:', error);
-                // Redirect to the main page in case of an error
-                window.location.href = 'index.html';
-            });
-    </script>
 </head>
 <body>
 
@@ -53,40 +37,49 @@
 
     <script>
         function checkLoginStatus() {
-            fetch('check_session.php')
+            fetch('backend/check_session.php')
                 .then(response => response.json())
                 .then(data => {
                     const loginLogoutButton = document.getElementById('loginLogoutButton');
                     const adminPageButton = document.getElementById('adminPageButton');
                     const myScheduleButton = document.getElementById('myScheduleButton');
                     const myReservationButton = document.getElementById('myReservationButton');
-                
+
                     if (data.isLoggedIn) {
                         loginLogoutButton.textContent = 'Logout';
-                        loginLogoutButton.href = 'logout.php';
+                        loginLogoutButton.href = 'backend/logout.php';
+
                         myScheduleButton.style.display = 'inline-block';
                         myReservationButton.style.display = 'inline-block';
-                    
+
                         if (data.role === 'admin') {
                             adminPageButton.style.display = 'inline-block';
                         }
-                    
-                    }
+                    } 
                     else {
+                        window.location.href = 'index.html';
+
                         loginLogoutButton.textContent = 'Login';
                         loginLogoutButton.href = 'login.html';
+
+                        myScheduleButton.style.display = 'none';
+                        myReservationButton.style.display = 'none';
+                        adminPageButton.style.display = 'none';
                     }
                 })
-            .catch(error => console.error('Error checking login status:', error));
+                .catch(error => {
+                    console.error('Error checking session:', error);
+                    window.location.href = 'index.html';
+                });
         }
 
-        // Extract the current `id` parameter from the URL
+        // Extract the current id parameter from the URL
         function getConferenceId() {
             const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('id'); // Get the `id` parameter
+            return urlParams.get('id');
         }
 
-        // Set the correct `id` for the links
+        // Set the correct id for the links
         function updateLinks() {
             const id = getConferenceId();
 
@@ -101,11 +94,11 @@
             const conferenceId = getConferenceId();
             const status = "pending";
 
-            fetch(`get_reservations.php?conference_id=${conferenceId}&status=${status}`)
+            fetch(`backend/get_reservations.php?conference_id=${conferenceId}&status=${status}`)
                 .then(response => response.json())
                 .then(data => {
                     const reservationList = document.getElementById('reservationList');
-                    reservationList.innerHTML = ''; // Clear the list
+                    reservationList.innerHTML = '';
 
                     data.forEach(reservation => {
                         const listItem = document.createElement('li');
@@ -116,7 +109,7 @@
                         // Create a container for the buttons
                         const buttonContainer = document.createElement('div');
                         buttonContainer.style.display = 'flex';
-                        buttonContainer.style.gap = '10px'; // Set gap between buttons to 10px
+                        buttonContainer.style.gap = '10px';
 
                         // Cancel Reservation Button
                         const cancelButton = document.createElement('button');
@@ -167,7 +160,7 @@
 
         // Confirm payment and update the status in the database
         function confirmPayment(reservationId, listItem) {
-            fetch('confirm_payment.php', {
+            fetch('backend/confirm_payment.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -177,7 +170,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        listItem.remove(); // Remove the item from the list after confirmation
+                        listItem.remove();
                         console.log('Payment confirmed for reservation ID:', reservationId);
 
                         // Check if the list is now empty
@@ -196,7 +189,7 @@
         // Cancel reservation and remove it from the database
         function cancelReservation(reservationId, listItem) {
             if (confirm("Are you sure to cancel this reservation?")) {
-                fetch('remove_from_reservations.php', {
+                fetch('backend/remove_from_reservations.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -206,7 +199,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            listItem.remove(); // Remove the item from the list after cancellation
+                            listItem.remove();
                             console.log('Reservation canceled successfully:', reservationId);
                         
                             // Check if the list is now empty
@@ -230,7 +223,6 @@
         // Attach event listener to the search bar
         document.getElementById('searchBar').addEventListener('input', filterReservations);
 
-        // Initialize the page
         checkLoginStatus();
         updateLinks();
         fetchReservations();

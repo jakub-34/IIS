@@ -17,7 +17,7 @@
             <a href="#">Admin page</a>
         </h2>
         <div style="float: right;">
-            <a href="logout.php" id="loginLogoutButton" class="login-button">Logout</a>
+            <a href="backend/logout.php" id="loginLogoutButton" class="login-button">Logout</a>
         </div>
     </div>
     
@@ -33,7 +33,7 @@
         let currentUser = null;
         
         // Check if the user is logged in and has the admin role
-        fetch('check_session.php')
+        fetch('backend/check_session.php')
             .then(response => response.json())
             .then(data => {
                 if (!data.isLoggedIn || data.role !== 'admin') {
@@ -47,7 +47,7 @@
             });
 
         // Load users from the server
-        fetch('get_users.php')
+        fetch('backend/get_users.php')
             .then(response => response.json())
             .then(data => {
                 var count = 1;
@@ -154,7 +154,7 @@
 
         // Function to update user role
         function updateRole(userId, newRole) {
-            fetch('update_role.php', {
+            fetch('backend/update_role.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -175,7 +175,7 @@
 
         // Function to delete user
         function deleteUser(userId) {
-            fetch('delete_user.php', {
+            fetch('backend/delete_user.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -1,8 +1,7 @@
 <?php
 include 'db_config.php';
 
-// Database query
-$sql = "SELECT user_id, name, lastname, username, role FROM users";
+$sql = "SELECT user_id, name, lastname, username, role FROM users ORDER BY username ASC";
 $result = $conn->query($sql);
 
 $users = [];

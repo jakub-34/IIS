@@ -14,7 +14,7 @@
             <a href="index.html" style="text-decoration: none; color: inherit;">
                 <i class="fas fa-home" style="margin-right: 5px;"></i>
             </a>
-            <a href="#">Add presentation</a>
+            <a href="#">Add presentation suggestion</a>
         </h2>
         <div style="float: right;">
             <a href="login.html" id="loginLogoutButton" class="login-button">Login</a>
@@ -23,8 +23,8 @@
         </div>
     </div>
 
-    <form id="presentationForm" class="form-container" method="POST" action="create_presentation.php">
-        <h2 style="color: black;">Add presentation</h2>
+    <form id="presentationForm" class="form-container" method="POST" action="backend/create_presentation.php">
+        <h2 style="color: black;">Add presentation suggestion</h2>
         <input type="hidden" name="conference_id" value="<?php echo isset($_GET['conference_id']) ? $_GET['conference_id'] : ''; ?>">
         <input type="text" name="title" placeholder="Name" required>
         <textarea name="description" style="height: 100px;" placeholder="Description" required></textarea>
@@ -32,16 +32,15 @@
     </form>
 
     <script>
-
         // Check if the user is logged in and get their role
-        fetch('check_session.php')
+        fetch('backend/check_session.php')
             .then(response => response.json())
             .then(data => {
                 const loginLogoutButton = document.getElementById('loginLogoutButton');
 
                 if (data.isLoggedIn) {  // User is logged in
                     loginLogoutButton.textContent = 'Logout';
-                    loginLogoutButton.href = 'logout.php';
+                    loginLogoutButton.href = 'backend/logout.php';
                 } 
                 else {  // User is not logged in
                     loginLogoutButton.textContent = 'Login';
@@ -64,7 +63,7 @@
             formData.append('conference_id', conferenceId); 
             
             // Sending data to the backend
-            fetch('create_presentation.php', {
+            fetch('backend/create_presentation.php', {
                 method: 'POST',
                 body: formData
             })

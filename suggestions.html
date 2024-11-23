@@ -33,407 +33,325 @@
         </table>
     </div>
 
-<script>
-
-
-// Funkce pro získání ID konference z URL parametru
-sessionStorage.setItem('previousPage_for_Login', window.location.href);
-function getConferenceId() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('id'); // Získá conference_id z URL, pokud existuje
-}
-const conferenceId = getConferenceId();
-document.getElementById('backLink').href = `conference_details.html?id=${conferenceId}`;
-document.getElementById('reservationLink').href = `manage_reservations.html?id=${conferenceId}`;
-
-// Funkce pro kontrolu stavu přihlášení
-function checkLoginStatus() {
-    fetch('check_session.php')
-        .then(response => response.json())
-        .then(data => {
-            const loginLogoutButton = document.getElementById('loginLogoutButton');
-            const adminPageButton = document.getElementById('adminPageButton');
-            const myScheduleButton = document.getElementById('myScheduleButton');
-            const myReservationButton = document.getElementById('myReservationButton');
-
-            if (data.isLoggedIn) {
-                loginLogoutButton.textContent = 'Logout';
-                loginLogoutButton.href = 'logout.php';
-                myScheduleButton.style.display = 'inline-block';
-                myReservationButton.style.display = 'inline-block';
-
-                if (data.role === 'admin') {
-                    adminPageButton.style.display = 'inline-block';
-                }
-
-            } else {
-                loginLogoutButton.textContent = 'Login';
-                loginLogoutButton.href = 'login.html';
-            }
-        })
-        .catch(error => console.error('Chyba při kontrole přihlášení:', error));
-}
-
-// Načtení stavu přihlášení po otevření stránky
-checkLoginStatus();
-
-function updatePresentationStatus(Id, status) {
-    fetch('update_presentation_status.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            presentation_id: Id,
-            status: status,
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log('Status byl úspěšně aktualizován');
-        } else {
-            console.error('Chyba při aktualizaci stavu');
+    <script>
+        // Function to get conference ID from URL parameter
+        function getConferenceId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
         }
-    })
-    .catch(error => console.error('Chyba při komunikaci s serverem:', error));
-}
+        const conferenceId = getConferenceId();
+        document.getElementById('backLink').href = `conference_details.html?id=${conferenceId}`;
+        document.getElementById('reservationLink').href = `manage_reservations.html?id=${conferenceId}`;
 
-function updatePresentation(data) {
-    fetch('update_presentation.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-        .then(response => response.json())
-        .then(result => {
-            if (result.success) {
-                console.log('Presentation updated successfully.');
-            } else {
-                console.error('Failed to update presentation:', result.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error updating presentation:', error);
-        });
-}
+        // Login status check function
+        function checkLoginStatus() {
+            fetch('backend/check_session.php')
+                .then(response => response.json())
+                .then(data => {
+                    const loginLogoutButton = document.getElementById('loginLogoutButton');
+                    const adminPageButton = document.getElementById('adminPageButton');
+                    const myScheduleButton = document.getElementById('myScheduleButton');
+                    const myReservationButton = document.getElementById('myReservationButton');
 
-function formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-    
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-}
+                    if (data.isLoggedIn) {
+                        loginLogoutButton.textContent = 'Logout';
+                        loginLogoutButton.href = 'backend/logout.php';
+                        myScheduleButton.style.display = 'inline-block';
+                        myReservationButton.style.display = 'inline-block';
 
-
-// Načtení prezentací z PHP skriptu
-fetch(`get_suggestions.php?conference_id=${conferenceId}`)
-    .then(response => response.json())
-    .then(data => {
-        var count = 1;
-        const statusInput = [];
-        const tableBody = document.getElementById('presentationTable');
-
-        // Hlavní obalovací div pro dva sloupce
-        const mainContainer = document.createElement('div');
-        mainContainer.style.display = 'flex';        
-        mainContainer.style.justifyContent = 'space-between';
-        mainContainer.style.gap = '20px';            
-
-        // Levý a pravý sloupec
-        const leftColumn = document.createElement('div');
-        leftColumn.style.flex = '1';
-
-        const rightColumn = document.createElement('div');
-        rightColumn.style.flex = '1';
-        console.log(data);
-
-        // Iterace přes data konferencí
-        data.forEach(conference => {
-            const currentCount = count;
-            const containerDiv = document.createElement('div');
-            containerDiv.style.display = 'flex';
-            containerDiv.style.alignItems = 'center';
-            containerDiv.style.marginBottom = '10px';
-            containerDiv.style.cursor = 'pointer';
-
-            /*containerDiv.onclick = () => {
-                window.location.href = `conference_details.html?id=${conference.conference_id}`;
-            };*/
-
-            const text = document.createElement('p');
-            text.innerHTML = `${count}`;
-            text.style.marginRight = '10px';
-            text.style.fontWeight = 'bold';
-
-            const wrapperDiv = document.createElement('div');
-            wrapperDiv.className = "conference";
-
-            const row1 = document.createElement('tr');
-            row1.innerHTML = `<td colspan="2" style="font-weight: bold;">${conference.title}</td>`;
-            row1.style.paddingBottom = '10vw';
-            wrapperDiv.appendChild(row1);
-            
-
-            const row2_1 = document.createElement('tr');
-            //row2_1.innerHTML = `<td>${new Date(conference.start_datetime).toLocaleDateString()} - ${new Date(conference.end_datetime).toLocaleDateString()}</td><td>${new Date(conference.start_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>-<td>${new Date(conference.end_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>`;
-            row2_1.innerHTML = `<td colspan="2">Speaker: ${conference.speaker_name} ${conference.speaker_lastname}</td>`;
-            wrapperDiv.appendChild(row2_1);
-
-            const row2 = document.createElement('tr');
-            //row2.innerHTML = `<td>${new Date(conference.start_datetime).toLocaleDateString()} - ${new Date(conference.end_datetime).toLocaleDateString()}</td><td>${new Date(conference.start_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>-<td>${new Date(conference.end_datetime).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>`;
-            row2.innerHTML = `<td colspan="2">${conference.description}</td>`;
-            wrapperDiv.appendChild(row2);
-            
-
-
-            const row3 = document.createElement('tr');
-            row3.innerHTML = `
-                <td>
-                <label for="date-${currentCount}">Date:</label>
-                <input type="date" id="date-${currentCount}" name="date-${currentCount}" value="${conference.date ? new Date(conference.date).toISOString().split('T')[0] : ''}">
-            </td>
-            `;
-            wrapperDiv.appendChild(row3);
-
-
-            const row4 = document.createElement('tr');
-            row4.innerHTML = `
-                <td style="width: 50%;">
-                    <label for="start_time-${currentCount}">Begin:</label>
-                    <input type="time" id="start_time-${currentCount}" name="start_time-${currentCount}" value="${conference.start_time ? formatTime(conference.start_time) : ''}">
-                </td>
-                <td style="width: 50%;">
-                    <label for="end_time-${currentCount}">End:</label>
-                    <input type="time" id="end_time-${currentCount}" name="end_time-${currentCount}" value="${conference.end_time ? formatTime(conference.end_time) : ''}">
-                </td>
-            `;
-            wrapperDiv.appendChild(row4);
-
-            function formatTime(timeString) {
-                if (!timeString) return '';
-
-                let date = new Date('1970-01-01T' + timeString + 'Z');
-                let hours = date.getUTCHours().toString().padStart(2, '0');
-                let minutes = date.getUTCMinutes().toString().padStart(2, '0');
-
-                return `${hours}:${minutes}`;
-            }
-            
-            const row5 = document.createElement('tr');
-            row5.innerHTML = `
-                <td style="display: flex; align-items: center; gap: 10px;">
-                    <label>Room:</label>
-                    <input type="text" style="width: 40%;" id="room-${currentCount}" value="${conference.room_name || ''}">
-                </td>
-            `;
-            wrapperDiv.appendChild(row5);
-
-
-
-
-            const row6 = document.createElement('tr');
-            const td = document.createElement('td');
-            td.colSpan = 2;
-
-            // Vytvoření checkboxu
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = `checkbox-${count}`;
-            checkbox.name = `conference-${count}`;
-            checkbox.title = "Add to conference";
-            checkbox.value = conference.presentation_id;
-            
-            // Pokud je status "approved", checkbox bude zaškrtnutý
-            checkbox.checked = (conference.status == 'approved');
-            statusInput[currentCount] = conference.status;
-
-            checkbox.addEventListener('change', () => {
-                if (checkbox.checked) {
-                    // Při zaškrtnutí checkboxu validujeme povinné vstupy
-                    const dateInput = document.getElementById(`date-${currentCount}`);
-                    const startTimeInput = document.getElementById(`start_time-${currentCount}`);
-                    const endTimeInput = document.getElementById(`end_time-${currentCount}`);
-                    const roomInput = document.getElementById(`room-${currentCount}`);
-                    // Kontrola, zda jsou všechna povinná pole vyplněná
-                    if (!dateInput.value || !startTimeInput.value || !endTimeInput.value || !roomInput.value) {
-                        alert('Please fill in all required fields before adding to the conference.');
-                        checkbox.checked = false; // Vrátí checkbox do nezaškrtnutého stavu
-                        return;
-                    }
-
-                    const startTime = new Date(`${dateInput.value}T${startTimeInput.value}:00`);
-                    const endTime = new Date(`${dateInput.value}T${endTimeInput.value}:00`);
-
-                    if (startTime >= endTime) {
-                        alert('Start time must be earlier than end time.');
-                        checkbox.checked = false; // Vrátí checkbox do nezaškrtnutého stavu
-                        return;
-                    }
-                    else if (dateInput.value < conference.conference_start.split(' ')[0] || dateInput.value > conference.conference_end.split(' ')[0]) {
-                        alert('Date must be within the conference date range.');
-                        checkbox.checked = false; // Uncheck the checkbox if the date is out of range
-                        return;
-                    }
-                    else if ((dateInput.value == conference.conference_start.split(' ')[0] && conference.conference_start.split(' ')[1].slice(0, 5) > startTimeInput.value) 
-                            || (dateInput.value == conference.conference_end.split(' ')[0] && conference.conference_end.split(' ')[1].slice(0, 5) < endTimeInput.value)) {
-                        alert('Time must be within the conference date range.');
-                        checkbox.checked = false; // Uncheck the checkbox if the date is out of range
-                        return;
-                    }
-
-                    //else
-                    //{
-                    for (let i = 1; i < count; i++) {
-                        if (i != currentCount && statusInput[i] == 'approved')
-                        {
-                            const date = document.getElementById(`date-${i}`);
-                            const room = document.getElementById(`room-${i}`);
-                            const startTime = document.getElementById(`start_time-${i}`);
-                            const endTime = document.getElementById(`end_time-${i}`);
-                            if (room.value == roomInput.value && date.value == dateInput.value)
-                            {
-                                if (startTimeInput.value >= startTime.value && startTimeInput.value < endTime.value) {
-                                    alert('2 lectures cannot take place in the same room at the same time.');
-                                    checkbox.checked = false;
-                                    return;
-                                }
-                                if (endTimeInput.value <= endTime.value && endTimeInput.value > startTime.value) {
-                                    alert('2 lectures cannot take place in the same room at the same time.');
-                                    checkbox.checked = false;
-                                    return;
-                                }
-                                if (endTimeInput.value > endTime.value && startTimeInput.value < startTime.value) {
-                                    alert('2 lectures cannot take place in the same room at the same time.');
-                                    checkbox.checked = false;
-                                    return;
-                                }
-                            }
+                        if (data.role === 'admin') {
+                            adminPageButton.style.display = 'inline-block';
                         }
-                        
+                    } 
+                    else {
+                        window.location.href = 'index.html';
                     }
-                        const data = {
-                            presentation_id: conference.presentation_id,
-                            date: dateInput.value,
-                            start_time: startTimeInput.value,
-                            end_time: endTimeInput.value,
-                            room: roomInput.value,
-                            status: 'approved'
-                        };
-                        statusInput[currentCount] = 'approved';
-                        updatePresentation(data);
-                    //}
+                })
+                .catch(error => console.error('Chyba při kontrole přihlášení:', error));
+        }
+        checkLoginStatus();
+
+        function updatePresentationStatus(Id, status) {
+            fetch('backend/update_presentation_status.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    presentation_id: Id,
+                    status: status,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Status byl úspěšně aktualizován');
+                } 
+                else {
+                    console.error('Chyba při aktualizaci stavu');
                 }
-                else{
-                    statusInput[currentCount] = 'not_approved';
-                    updatePresentationStatus(conference.presentation_id, checkbox.checked ? 'approved' : 'not_approved')
-                }
-            });
+            })
+            .catch(error => console.error('Chyba při komunikaci s serverem:', error));
+        }
+
+        function updatePresentation(data) {
+            fetch('backend/update_presentation.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        console.log('Presentation updated successfully.');
+                    } 
+                    else {
+                        console.error('Failed to update presentation:', result.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating presentation:', error);
+                });
+        }
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
             
-
-            // Vytvoření labelu pro checkbox
-            const label = document.createElement('label');
-            label.setAttribute('for', checkbox.id);
-            label.textContent = 'Add to conference';
-
-            // Připojení labelu a checkboxu do tabulky
-            td.appendChild(label);
-            td.appendChild(checkbox);
-            row6.appendChild(td);
-            wrapperDiv.appendChild(row6);
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
 
 
-            containerDiv.appendChild(text);
-            containerDiv.appendChild(wrapperDiv);
+        // Loading presentations from a PHP script
+        fetch(`backend/get_suggestions.php?conference_id=${conferenceId}`)
+            .then(response => response.json())
+            .then(data => {
+                var count = 1;
+                const statusInput = [];
+                const tableBody = document.getElementById('presentationTable');
 
-            if (count % 2 !== 0) {
-                leftColumn.appendChild(containerDiv);
-            } else {
-                rightColumn.appendChild(containerDiv);
-            }
+                // Main wrapper div for two columns
+                const mainContainer = document.createElement('div');
+                mainContainer.style.display = 'flex';        
+                mainContainer.style.justifyContent = 'space-between';
+                mainContainer.style.gap = '20px';            
 
-            count++;
-        });
+                // Left and right column
+                const leftColumn = document.createElement('div');
+                leftColumn.style.flex = '1';
 
-        mainContainer.appendChild(leftColumn);
-        mainContainer.appendChild(rightColumn);
-        tableBody.appendChild(mainContainer);
-         // Po načtení konferencí načteme místnosti
+                const rightColumn = document.createElement('div');
+                rightColumn.style.flex = '1';
+                console.log(data);
 
-    })
+                // Iteration over conference dates
+                data.forEach(conference => {
+                    const currentCount = count;
+                    const containerDiv = document.createElement('div');
+                    containerDiv.style.display = 'flex';
+                    containerDiv.style.alignItems = 'center';
+                    containerDiv.style.marginBottom = '10px';
+                    containerDiv.style.cursor = 'pointer';
+
+                    const text = document.createElement('p');
+                    text.innerHTML = `${count}`;
+                    text.style.marginRight = '10px';
+                    text.style.fontWeight = 'bold';
+
+                    const wrapperDiv = document.createElement('div');
+                    wrapperDiv.className = "conference";
+
+                    const row1 = document.createElement('tr');
+                    row1.innerHTML = `<td colspan="2"><strong>Title: </strong>${conference.title}</td>`;
+                    row1.style.paddingBottom = '10vw';
+                    wrapperDiv.appendChild(row1);
+                    
+
+                    const row2_1 = document.createElement('tr');
+                    row2_1.innerHTML = `<td colspan="2"><strong>Speaker:</strong> ${conference.speaker_name} ${conference.speaker_lastname}</td>`;
+                    wrapperDiv.appendChild(row2_1);
+
+                    const row2 = document.createElement('tr');
+                    row2.innerHTML = `<td colspan="2"><p style="margin: 5px 0;"><strong>Description: </strong>${conference.description}</p></td>`;
+                    wrapperDiv.appendChild(row2);
+                    
 
 
-/*fetch(`conference_details.php?conference_id=${conferenceId}`)
-    .then(response => response.json())
-    .then(data => {
-        var count = 1;
-        const tableBody = document.getElementById('presentationTable');
-
-        // Hlavní obalovací div pro dva sloupce
-        const mainContainer = document.createElement('div');
-        mainContainer.style.display = 'flex';        
-        mainContainer.style.justifyContent = 'space-between';
-        mainContainer.style.gap = '20px';            
+                    const row3 = document.createElement('tr');
+                    row3.innerHTML = `
+                        <td>
+                        <strong>Date:</strong>
+                        <input type="date" id="date-${currentCount}" name="date-${currentCount}" value="${conference.date ? new Date(conference.date).toISOString().split('T')[0] : ''}">
+                    </td>
+                    `;
+                    wrapperDiv.appendChild(row3);
 
 
-        // Levý a pravý sloupec
-        const leftColumn = document.createElement('div');
-        leftColumn.style.flex = '1';
+                    const row4 = document.createElement('tr');
+                    row4.innerHTML = `
+                        <td style="width: 50%;">
+                            <strong>Begin:</strong>
+                            <input type="time" id="start_time-${currentCount}" name="start_time-${currentCount}" value="${conference.start_time ? formatTime(conference.start_time) : ''}">
+                        </td>
+                        <td style="width: 50%;">
+                            <strong>End:</strong>
+                            <input type="time" id="end_time-${currentCount}" name="end_time-${currentCount}" value="${conference.end_time ? formatTime(conference.end_time) : ''}">
+                        </td>
+                    `;
+                    wrapperDiv.appendChild(row4);
 
-        const rightColumn = document.createElement('div');
-        rightColumn.style.flex = '1';
+                    function formatTime(timeString) {
+                        if (!timeString) return '';
 
-        // Iterace přes data prezentací
-        data.forEach(presentation => {
-            const containerDiv = document.createElement('div');
-            containerDiv.style.display = 'flex';
-            containerDiv.style.alignItems = 'center';
-            containerDiv.style.marginBottom = '10px';
-            containerDiv.style.cursor = 'pointer';
+                        let date = new Date('1970-01-01T' + timeString + 'Z');
+                        let hours = date.getUTCHours().toString().padStart(2, '0');
+                        let minutes = date.getUTCMinutes().toString().padStart(2, '0');
 
-            const text = document.createElement('p');
-            text.innerHTML = `${count}`;
-            text.style.marginRight = '10px';
-            text.style.fontWeight = 'bold';
+                        return `${hours}:${minutes}`;
+                    }
+                    
+                    const row5 = document.createElement('tr');
+                    row5.innerHTML = `
+                        <td style="display: flex; align-items: center; gap: 10px;">
+                            <strong>Room:</strong>
+                            <input type="text" style="width: 40%;" id="room-${currentCount}" value="${conference.room_name || ''}">
+                        </td>
+                    `;
+                    wrapperDiv.appendChild(row5);
 
-            const wrapperDiv = document.createElement('div');
-            wrapperDiv.className = "presentation";
 
-            // Prezentace - řádky
-            const row1 = document.createElement('tr');
-            row1.innerHTML = `<td colspan="2" style="font-weight: bold;">${presentation.title}</td>`;
-            row1.style.paddingBottom = '10vw';
-            wrapperDiv.appendChild(row1);
 
-            const row2 = document.createElement('tr');
-            row2.innerHTML = `<td>${new Date(presentation.start_time).toLocaleDateString()} - ${new Date(presentation.end_time).toLocaleDateString()}</td><td>${new Date(presentation.start_time).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>-<td>${new Date(presentation.end_time).toLocaleTimeString('cs-CZ',  { hour: '2-digit', minute: '2-digit', hour12: false })}</td>`;
-            wrapperDiv.appendChild(row2);
 
-            containerDiv.appendChild(text);
-            containerDiv.appendChild(wrapperDiv);
+                    const row6 = document.createElement('tr');
+                    const td = document.createElement('td');
+                    td.colSpan = 2;
 
-            if (count % 2 !== 0) {
-                leftColumn.appendChild(containerDiv);
-            } else {
-                rightColumn.appendChild(containerDiv);
-            }
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `checkbox-${count}`;
+                    checkbox.name = `conference-${count}`;
+                    checkbox.title = "Add to conference";
+                    checkbox.value = conference.presentation_id;
+                    
+                    // If the status is "approved", the checkbox will be checked.
+                    checkbox.checked = (conference.status == 'approved');
+                    statusInput[currentCount] = conference.status;
 
-            count++;
-        });
+                    checkbox.addEventListener('change', () => {
+                        if (checkbox.checked) {
+                            const dateInput = document.getElementById(`date-${currentCount}`);
+                            const startTimeInput = document.getElementById(`start_time-${currentCount}`);
+                            const endTimeInput = document.getElementById(`end_time-${currentCount}`);
+                            const roomInput = document.getElementById(`room-${currentCount}`);
+                            
+                            // Checking if all required fields are filled in
+                            if (!dateInput.value || !startTimeInput.value || !endTimeInput.value || !roomInput.value) {
+                                alert('Please fill in all required fields before adding to the conference.');
+                                checkbox.checked = false;
+                                return;
+                            }
 
-        mainContainer.appendChild(leftColumn);
-        mainContainer.appendChild(rightColumn);
-        tableBody.appendChild(mainContainer);
-        //tableBody.appendChild(mainContainer);
+                            const startTime = new Date(`${dateInput.value}T${startTimeInput.value}:00`);
+                            const endTime = new Date(`${dateInput.value}T${endTimeInput.value}:00`);
 
-    });*/
-</script>
+                            if (startTime >= endTime) {
+                                alert('Start time must be earlier than end time.');
+                                checkbox.checked = false;
+                                return;
+                            }
+                            else if (dateInput.value < conference.conference_start.split(' ')[0] || dateInput.value > conference.conference_end.split(' ')[0]) {
+                                alert('Date must be within the conference date range.');
+                                checkbox.checked = false;
+                                return;
+                            }
+                            else if ((dateInput.value == conference.conference_start.split(' ')[0] && conference.conference_start.split(' ')[1].slice(0, 5) > startTimeInput.value) 
+                                    || (dateInput.value == conference.conference_end.split(' ')[0] && conference.conference_end.split(' ')[1].slice(0, 5) < endTimeInput.value)) {
+                                alert('Time must be within the conference date range.');
+                                checkbox.checked = false;
+                                return;
+                            }
+
+                            for (let i = 1; i < count; i++) {
+                                if (i != currentCount && statusInput[i] == 'approved')
+                                {
+                                    const date = document.getElementById(`date-${i}`);
+                                    const room = document.getElementById(`room-${i}`);
+                                    const startTime = document.getElementById(`start_time-${i}`);
+                                    const endTime = document.getElementById(`end_time-${i}`);
+                                    if (room.value == roomInput.value && date.value == dateInput.value)
+                                    {
+                                        if (startTimeInput.value >= startTime.value && startTimeInput.value < endTime.value) {
+                                            alert('2 lectures cannot take place in the same room at the same time.');
+                                            checkbox.checked = false;
+                                            return;
+                                        }
+                                        if (endTimeInput.value <= endTime.value && endTimeInput.value > startTime.value) {
+                                            alert('2 lectures cannot take place in the same room at the same time.');
+                                            checkbox.checked = false;
+                                            return;
+                                        }
+                                        if (endTimeInput.value > endTime.value && startTimeInput.value < startTime.value) {
+                                            alert('2 lectures cannot take place in the same room at the same time.');
+                                            checkbox.checked = false;
+                                            return;
+                                        }
+                                    }
+                                }
+                                
+                            }
+                                const data = {
+                                    presentation_id: conference.presentation_id,
+                                    date: dateInput.value,
+                                    start_time: startTimeInput.value,
+                                    end_time: endTimeInput.value,
+                                    room: roomInput.value,
+                                    status: 'approved'
+                                };
+                                statusInput[currentCount] = 'approved';
+                                updatePresentation(data);
+                        }
+                        else{
+                            statusInput[currentCount] = 'not_approved';
+
+                            updatePresentationStatus(conference.presentation_id, checkbox.checked ? 'approved' : 'not_approved')
+                        }
+                    });
+                    
+                    const label = document.createElement('label');
+                    label.setAttribute('for', checkbox.id);
+                    label.textContent = 'Add to conference';
+                    label.style.fontWeight = 'bold';
+
+                    td.appendChild(label);
+                    td.appendChild(checkbox);
+                    row6.appendChild(td);
+                    wrapperDiv.appendChild(row6);
+
+
+                    containerDiv.appendChild(text);
+                    containerDiv.appendChild(wrapperDiv);
+
+                    if (count % 2 !== 0) {
+                        leftColumn.appendChild(containerDiv);
+                    } 
+                    else {
+                        rightColumn.appendChild(containerDiv);
+                    }
+
+                    count++;
+                });
+
+                mainContainer.appendChild(leftColumn);
+                mainContainer.appendChild(rightColumn);
+                tableBody.appendChild(mainContainer);
+            })
+    </script>
 
 </body>
 </html>

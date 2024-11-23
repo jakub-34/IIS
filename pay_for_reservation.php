@@ -35,10 +35,12 @@ $stmt->bind_param("ii", $reservationId, $userId);
 if ($stmt->execute()) {
     if ($stmt->affected_rows > 0) {
         echo json_encode(['success' => true]);
-    } else {
+    } 
+    else {
         echo json_encode(['success' => false, 'error' => 'Reservation not found, already paid, or not owned by user.']);
     }
-} else {
+} 
+else {
     echo json_encode(['success' => false, 'error' => 'Failed to update reservation status.']);
 }
 
