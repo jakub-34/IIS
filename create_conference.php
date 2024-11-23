@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $stmt->close();
     $conn->close();
-    header("Location: ../index.html");
+    header("Location: index.html");
     exit;
 }
 ?>

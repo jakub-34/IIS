@@ -42,7 +42,7 @@ if (isset($_SESSION['user_id']) && isset($_GET['conference_id'])) {
     $stmt->bind_param("iiis", $userId, $conferenceId, $ticketsCount, $status);
 
     if ($stmt->execute()) {
-        header('Location: ../user_reservations.html');
+        header('Location: user_reservations.html');
         exit;
     } 
     else {

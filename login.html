@@ -20,7 +20,7 @@
     </div>
 
     <div class="body">
-        <form id="loginForm" class="form-container" method="POST" action="backend/login.php">
+        <form id="loginForm" class="form-container" method="POST" action="login.php">
             <h2 style="color: black;">Login</h2>
             
             <input type="hidden" id="previousPage" name="previousPage" value="">
@@ -37,7 +37,7 @@
         </form>
         <script>
             // Check if the user is logged in and
-            fetch('backend/check_session.php')
+            fetch('check_session.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.isLoggedIn) {

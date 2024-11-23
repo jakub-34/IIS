@@ -22,7 +22,7 @@
     </div>
 
     <div class="body">
-        <form id="reserveForm" class="form-container" method="POST" action="backend/reserve_tickets.php">
+        <form id="reserveForm" class="form-container" method="POST" action="reserve_tickets.php">
             <h2 style="color: black;">Reserve Tickets</h2>
         
             <input type="text" id="name" name="name" placeholder="Name" required>
@@ -51,10 +51,10 @@
         const conferenceId = getConferenceId();
         document.addEventListener("DOMContentLoaded", () => {
             const form = document.querySelector("form");
-            form.action = `backend/reserve_tickets.php?conference_id=${conferenceId}`;
+            form.action = `reserve_tickets.php?conference_id=${conferenceId}`;
         });
 
-        fetch('backend/check_session.php')
+        fetch('check_session.php')
             .then(response => response.json())
             .then(data => {
                 if (data.isLoggedIn) {
@@ -81,7 +81,7 @@
                 const formData = new FormData(form);
                 const conferenceId = new URLSearchParams(window.location.search).get("conference_id");
 
-                fetch(`backend/reserve_tickets.php?conference_id=${conferenceId}`, {
+                fetch(`reserve_tickets.php?conference_id=${conferenceId}`, {
                     method: "POST",
                     body: formData,
                 })
