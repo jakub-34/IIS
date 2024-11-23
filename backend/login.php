@@ -25,11 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         } 
         else {
-            echo "<script>alert('Wrong username or password.'); window.location.href='login.html';</script>";
+            echo "<script>alert('Wrong username or password.'); window.location.href='../login.html';</script>";
         }
     } 
     else {
-        echo "<script>alert('Wrong username or password.'); window.location.href='login.html';</script>";
+        echo "<script>alert('Wrong username or password.'); window.location.href='../login.html';</script>";
     }
 
     $stmt->close();

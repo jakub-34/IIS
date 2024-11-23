@@ -37,7 +37,7 @@
 
     <script>
         function checkLoginStatus() {
-            fetch('check_session.php')
+            fetch('backend/check_session.php')
                 .then(response => response.json())
                 .then(data => {
                     const loginLogoutButton = document.getElementById('loginLogoutButton');
@@ -47,7 +47,7 @@
 
                     if (data.isLoggedIn) {
                         loginLogoutButton.textContent = 'Logout';
-                        loginLogoutButton.href = 'logout.php';
+                        loginLogoutButton.href = 'backend/logout.php';
 
                         myScheduleButton.style.display = 'inline-block';
                         myReservationButton.style.display = 'inline-block';
@@ -94,7 +94,7 @@
             const conferenceId = getConferenceId();
             const status = "pending";
 
-            fetch(`get_reservations.php?conference_id=${conferenceId}&status=${status}`)
+            fetch(`backend/get_reservations.php?conference_id=${conferenceId}&status=${status}`)
                 .then(response => response.json())
                 .then(data => {
                     const reservationList = document.getElementById('reservationList');
@@ -160,7 +160,7 @@
 
         // Confirm payment and update the status in the database
         function confirmPayment(reservationId, listItem) {
-            fetch('confirm_payment.php', {
+            fetch('backend/confirm_payment.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -189,7 +189,7 @@
         // Cancel reservation and remove it from the database
         function cancelReservation(reservationId, listItem) {
             if (confirm("Are you sure to cancel this reservation?")) {
-                fetch('remove_from_reservations.php', {
+                fetch('backend/remove_from_reservations.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

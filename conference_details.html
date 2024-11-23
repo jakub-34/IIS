@@ -57,7 +57,7 @@
 
         const conferenceId = getConferenceId();
         function loadUserData() {
-            fetch(`get_conference_data.php?id=${conferenceId}`)
+            fetch(`backend/get_conference_data.php?id=${conferenceId}`)
             .then(response => response.json())
             .then(data => {
                 const suggestionLink = document.getElementById('suggestionLink');
@@ -76,7 +76,7 @@
         let isLoggedIn = false;
         // Login status check function
         function checkLoginStatus() {
-            fetch('check_session.php')
+            fetch('backend/check_session.php')
                 .then(response => response.json())
                 .then(data => {
                     const loginLogoutButton = document.getElementById('loginLogoutButton');
@@ -88,7 +88,7 @@
                     if (data.isLoggedIn) {
                         isLoggedIn = true;
                         loginLogoutButton.textContent = 'Logout';
-                        loginLogoutButton.href = 'logout.php';
+                        loginLogoutButton.href = 'backend/logout.php';
                         myScheduleButton.style.display = 'inline-block';
                         myReservationButton.style.display = 'inline-block';
         
@@ -108,7 +108,7 @@
         checkLoginStatus();
 
         // Loading presentations from a PHP script
-        fetch(`conference_details.php?conference_id=${conferenceId}`)
+        fetch(`backend/conference_details.php?conference_id=${conferenceId}`)
             .then(response => response.json())
             .then(data => {
                 var count = 1;
@@ -164,7 +164,7 @@
                         window.location.href = 'index.html';
                     }
                 });
-                fetch(`get_conference_data.php?id=${conferenceId}`)
+                fetch(`backend/get_conference_data.php?id=${conferenceId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.userId == data.organizerId){
@@ -222,7 +222,7 @@
                 else {
                     reserveTicketButton.textContent = 'Reserve Ticket';
                     reserveTicketButton.href = isLoggedIn
-                        ? `create_reservation.php?conference_id=${conferenceId}`
+                        ? `backend/create_reservation.php?conference_id=${conferenceId}`
                         : `reserve_tickets.html?conference_id=${conferenceId}`;
                 }
 
@@ -297,7 +297,7 @@
 
                     // Adding a checkbox for logged in users only
                     if (isLoggedIn) {
-                        fetch(`check_schedule.php?presentation_id=${presentation.presentation_id}`)
+                        fetch(`backend/check_schedule.php?presentation_id=${presentation.presentation_id}`)
                         .then(response => response.json())
                         .then(scheduleData => {
                             const checkbox = document.createElement('input');
@@ -315,7 +315,7 @@
 
                             checkbox.addEventListener('change', () => {
                                 if (checkbox.checked) {
-                                    fetch('add_to_schedule.php', {
+                                    fetch('backend/add_to_schedule.php', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({ presentation_id: presentation.presentation_id })
@@ -333,7 +333,7 @@
                                         });
                                 } 
                                 else {
-                                    fetch('remove_from_schedule.php', {
+                                    fetch('backend/remove_from_schedule.php', {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({ presentation_id: presentation.presentation_id })
@@ -375,7 +375,7 @@
 
         // Function to delete conference
         function deleteConference(conferenceID) {
-            fetch('delete_conference.php', {
+            fetch('backend/delete_conference.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

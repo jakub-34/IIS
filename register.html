@@ -20,7 +20,7 @@
     </div>
 
     <div class="body">
-        <form id="registerForm" class="form-container" method="POST" action="register.php" onsubmit="return validateForm()">
+        <form id="registerForm" class="form-container" method="POST" action="backend/register.php" onsubmit="return validateForm()">
             <h2 style="color: black;">Registration</h2>
             
             <input type="text" id="name" name="name" placeholder="Name" required>
@@ -42,7 +42,7 @@
     <script>
 
         // Check if the user is logged in
-        fetch('check_session.php')
+        fetch('backend/check_session.php')
             .then(response => response.json())
             .then(data => {
                 if (data.isLoggedIn) {
@@ -108,7 +108,7 @@
                 return;
             }
 
-            fetch(`check_username.php?username=${encodeURIComponent(username)}`)
+            fetch(`backend/check_username.php?username=${encodeURIComponent(username)}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.exists) {
