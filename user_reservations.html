@@ -17,7 +17,7 @@
             <a href="#">My Reservations</a>
         </h2>
         <div style="float: right;">
-            <a href="backend/logout.php" id="loginLogoutButton" class="login-button">Logout</a>
+            <a href="logout.php" id="loginLogoutButton" class="login-button">Logout</a>
         </div>
     </div>
 
@@ -41,7 +41,7 @@
 
     <script>
         // Check if the user is logged in and has the admin role
-        fetch('backend/check_session.php')
+        fetch('check_session.php')
             .then(response => response.json())
             .then(data => {
                 if (!data.isLoggedIn) {
@@ -55,7 +55,7 @@
 
         // Function to load the user's reservations
         function loadReservations() {
-            fetch('backend/get_user_reservations.php')
+            fetch('get_user_reservations.php')
             .then(response => response.json())
             .then(data => {
                 const reservationsTable = document.getElementById('reservationsTable');
@@ -131,7 +131,7 @@
 
 
         function updateTicketCount(reservationId, newTicketCount) {
-            fetch('backend/update_ticket_count.php', {
+            fetch('update_ticket_count.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -152,7 +152,7 @@
 
         // Function to remove a reservation
         function removeReservation(reservationId) {
-            fetch('backend/remove_from_reservations.php', {
+            fetch('remove_from_reservations.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -169,7 +169,7 @@
 
         // Function to process payment
         function processPayment(reservationId) {
-            fetch('backend/pay_for_reservation.php', {
+            fetch('pay_for_reservation.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

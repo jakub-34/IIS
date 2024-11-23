@@ -45,7 +45,7 @@
 
         // Login status check function
         function checkLoginStatus() {
-            fetch('backend/check_session.php')
+            fetch('check_session.php')
                 .then(response => response.json())
                 .then(data => {
                     const loginLogoutButton = document.getElementById('loginLogoutButton');
@@ -55,7 +55,7 @@
 
                     if (data.isLoggedIn) {
                         loginLogoutButton.textContent = 'Logout';
-                        loginLogoutButton.href = 'backend/logout.php';
+                        loginLogoutButton.href = 'logout.php';
                         myScheduleButton.style.display = 'inline-block';
                         myReservationButton.style.display = 'inline-block';
 
@@ -72,7 +72,7 @@
         checkLoginStatus();
 
         function updatePresentationStatus(Id, status) {
-            fetch('backend/update_presentation_status.php', {
+            fetch('update_presentation_status.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -95,7 +95,7 @@
         }
 
         function updatePresentation(data) {
-            fetch('backend/update_presentation.php', {
+            fetch('update_presentation.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -129,7 +129,7 @@
 
 
         // Loading presentations from a PHP script
-        fetch(`backend/get_suggestions.php?conference_id=${conferenceId}`)
+        fetch(`get_suggestions.php?conference_id=${conferenceId}`)
             .then(response => response.json())
             .then(data => {
                 var count = 1;
