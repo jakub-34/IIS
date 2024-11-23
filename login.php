@@ -6,7 +6,12 @@ session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
-    $previousPage = $_POST['previousPage'] ?? 'index.html';
+    $parts = explode('/', $_POST['previousPage']);
+    $lastPart = end($parts); 
+    if ($lastPart == 'login.php')
+        $previousPage = 'index.html';
+    else
+        $previousPage = $_POST['previousPage'] ?? 'index.html';
 
     // Find user in database
     $stmt = $conn->prepare("SELECT user_id, username, password, role FROM users WHERE username = ?");
