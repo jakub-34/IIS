@@ -113,18 +113,38 @@
                         listItem.dataset.lastname = reservation.lastname.toLowerCase(); // Store lowercase last name for searching
                         listItem.dataset.reservationId = reservation.reservation_id;
 
+                        // Create a container for the buttons
+                        const buttonContainer = document.createElement('div');
+                        buttonContainer.style.display = 'flex';
+                        buttonContainer.style.gap = '10px'; // Set gap between buttons to 10px
+
+                        // Cancel Reservation Button
+                        const cancelButton = document.createElement('button');
+                        cancelButton.textContent = 'Cancel Reservation';
+                        cancelButton.classList.add('cancel-button');
+                        cancelButton.addEventListener('click', () => {
+                            const reservationId = reservation.reservation_id;
+                            cancelReservation(reservationId, listItem);
+                        });
+                    
                         // Confirm Payment Button
                         const confirmButton = document.createElement('button');
                         confirmButton.textContent = 'Confirm Payment';
-
+                        confirmButton.classList.add('confirm-button');
                         confirmButton.addEventListener('click', () => {
                             const reservationId = reservation.reservation_id;
                             confirmPayment(reservationId, listItem);
                         });
-
-                        listItem.appendChild(confirmButton);
+                    
+                        // Add buttons to the container
+                        buttonContainer.appendChild(cancelButton);
+                        buttonContainer.appendChild(confirmButton);
+                    
+                        // Add the button container to the list item
+                        listItem.appendChild(buttonContainer);
                         reservationList.appendChild(listItem);
                     });
+
                 })
             .catch(error => console.error('Error fetching reservations:', error));
         }
@@ -172,6 +192,40 @@
                 })
                 .catch(error => console.error('Error confirming payment:', error));
         }
+
+        // Cancel reservation and remove it from the database
+        function cancelReservation(reservationId, listItem) {
+            if (confirm("Are you sure to cancel this reservation?")) {
+                fetch('remove_from_reservations.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reservation_id: reservationId })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            listItem.remove(); // Remove the item from the list after cancellation
+                            console.log('Reservation canceled successfully:', reservationId);
+                        
+                            // Check if the list is now empty
+                            const reservationList = document.getElementById('reservationList');
+                            if (reservationList.children.length === 0) {
+                                alert('All pending reservations have been processed.');
+                            }
+                        }
+                        else {
+                            alert('Failed to cancel reservation: ' + data.error);
+                        }
+                    })
+                    .catch(error => console.error('Error canceling reservation:', error));
+            }
+            else {
+                console.log('Cancellation action was declined.');
+            }
+        }
+
 
         // Attach event listener to the search bar
         document.getElementById('searchBar').addEventListener('input', filterReservations);

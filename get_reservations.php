@@ -37,7 +37,7 @@ while ($stmt->fetch()) {
         'reservation_id' => $reservation_id,
         'name' => $name,
         'lastname' => $lastname,
-        'tickets_count' => $tickets_count // Include tickets_count
+        'tickets_count' => $tickets_count
     ];
 }
 

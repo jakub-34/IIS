@@ -8,6 +8,52 @@ $conference_id = isset($_GET['conference_id']) ? intval($_GET['conference_id']) 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $lastname = $_POST['lastname'];
+    $tickets_count = $_POST['tickets_count'];
+    $status = $_POST['payment_status']; // Assuming this is passed in the form
+
+    // Fetch the total capacity and the already reserved tickets for the conference
+    $sql_capacity = "
+        SELECT 
+            c.capacity AS total_capacity,
+            IFNULL(SUM(r.tickets_count), 0) AS reserved_tickets
+        FROM 
+            conferences c
+        LEFT JOIN 
+            reservations r ON r.conference_id = c.conference_id AND r.status != 'cancelled'
+        WHERE 
+            c.conference_id = ?
+        GROUP BY 
+            c.conference_id
+    ";
+
+    $stmt = $conn->prepare($sql_capacity);
+    if (!$stmt) {
+        echo "Error preparing statement";
+        exit;
+    }
+
+    $stmt->bind_param("i", $conference_id);
+    $stmt->execute();
+    $stmt->store_result();
+    $stmt->bind_result($total_capacity, $reserved_tickets);
+
+    if ($stmt->fetch()) {
+        $remaining_capacity = $total_capacity - $reserved_tickets;
+    } else {
+        echo json_encode(['success' => false, 'error' => 'Conference not found.']);
+        exit;
+    }
+
+    $stmt->close();
+
+    // Check if there are enough available tickets
+    if ($tickets_count > $remaining_capacity) {
+        echo json_encode([
+            'success' => false,
+            'error' => "Not enough tickets available. Remaining capacity: $remaining_capacity."
+        ]);
+        exit;
+    }
 
     // Add new user into database
     $stmt = $conn->prepare("INSERT INTO users (name, lastname, role) VALUES (?, ?, 'guest')");
@@ -15,9 +61,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $user_id = $conn->insert_id; 
     $stmt->close();
-
-    $tickets_count = $_POST['tickets_count'];
-    $status = $_POST['payment_status']; // Assuming this is passed in the form
 
     // Reservation creation part
     $stmt = $conn->prepare("INSERT INTO reservations (user_id, conference_id, tickets_count, status) VALUES (?, ?, ?, ?)");
@@ -28,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: index.html?conference_id=$conference_id&status=success");
         exit;
     } else {
-        header("Location: index.html.php?conference_id=$conference_id&status=error");
+        header("Location: index.html?conference_id=$conference_id&status=error");
         exit;
     }
 
