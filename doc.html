@@ -3,7 +3,7 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-2"/>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Projekt IIS</title>
     <style type="text/css">
     	table { border-collapse: collapse; }
@@ -22,19 +22,18 @@
 	<dt>Autoři</dt>
 	<dd>Jakub Hrdlička <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
 	    <a href="mailto:xhrdli18@stud.fit.vutbr.cz">xhrdli18@stud.fit.vutbr.cz</a> -
-		
+		rozvrh uzívateľa, prihlásenie, registácia, nezaplatené rezervácie z pohľadu usporiadateľa konferencie
 	</dd>
 	<dd>Jan Furik <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
 	    <a href="mailto:xfurik00@stud.fit.vutbr.cz">xfurik00@stud.fit.vutbr.cz</a> - 
-		popis činnosti v týmu
+		výpis konferencií, prezentácie, návrhy prezentácií, schvaľovanie prezentácií
 	</dd>
   <dd>Rebeka Tydorová <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
 	    <a href="mailto:xtydor01@stud.fit.vutbr.cz">xtydor01@stud.fit.vutbr.cz</a> - 
-		popis činnosti v týmu
+		vytvorenie novej konferencie, rezervácie užívateľov, rezervácia lístkov
 	</dd>
 	<dt>URL aplikace</dt>
 	<dd><a href="http://www.stud.fit.vutbr.cz/~xfurik00/IIS">http://www.stud.fit.vutbr.cz/~xfurik00/IIS</a></dd>
-	<dd>(pokud má aplikace více vstupních stránek, napište obdobně další URL)</dd>
 </dl>
 
 <h2>Uživatelé systému pro testování</h2>
@@ -46,26 +45,66 @@
 <tr><td>franta</td><td>franta</td><td>Zákazník</td></tr>
 </table>
 
-<p>(Diagram případů užití není nutné vkládat, pokud IS implementuje role a případy užití definované zadáním.)</p> 
-
 <h3>Video</h3>
 
 <p>Přiložte odkaz na komentované video demostrující použití informačního systému. Zaměřte se na případy užití definované zadáním (např. registrace uživatele, správa uživatelů a činnosti jednotlivých rolí). Video nahrajte například na VUT Google Drive, kde ho bude možné přímo spustit z odkazu.</p> 
 
 <h2>Implementace</h2>
-<p>Stručná dokumentace k implementaci, která popisuje, které části projektu (např. PHP skripty) implementují jednotlivé případy použití.</p>
+<p>
+	<h3>administrátor:</h3>
+	<ul>
+		<li>update_role.php, delete_user.php - správa užívateľov</li>
+	</ul>
+	<h3>registrovaný užívateľ:</h3>
+	<ul>
+		<li>create_conference.php - vytvorenie konferencie</li>
+		<h4>zakladateľ konferencie:</h4>
+		<ul>
+			<li>update_presentation_status.php - schválenie/odobratie prezentácie</li>
+			<li>update_presentation.php - priradenie miestnosti a času prezentácii</li>
+			<li>confirm_payment.php - potvrdenie platby za rezervované lístky</li>
+			<li>remove_from_reservations.php - odstránenie rezervovaných lístkov</li>
+		</ul><br>
+		<li>create_presentation.php - vytvorenie návrhu na prezentáciu</li>
+		<h4>prednášajúci na konferencii:</h4>
+		<ul>
+			<li>get_user_schedule.php - načítanie prezenácií užívateľa</li>
+		</ul><br>
+		<li>create_reservation.php - vytvorenie rezervácie na konferenciu</li>
+		<h4>návštevník konferenice:</h4>
+		<ul>
+			<li>get_user_reservations.php - načítanie rezervácií užívateľa</li>
+			<li>update_ticket_count.php, remove_from_reservations.php, pay_for_reservation.php - správa rezervácií z pohľadu návševníka konferencie</li>
+			<li>conference_details.php - načítanie detailov o konferencii spolu s prednáškami</li>
+			<li>check_schedule.php - pridanie prednášky do osobného rozvrhu</li>
+		</ul>
+	</ul>
+	<h3>neregistrovaný užívateľ:</h3>
+	<ul>
+		<li>get_conferences.php - načítanie konferencií</li>
+		<li>conference_details.php - načítava detaily o konferencii, ktoré zajŕňajú aj stav kapacity</li>
+		<li>reserve_tickets.php - vytvorenie rezervácie na konferenciu</li>
+	</ul>
+</p>
 
 <h3>Databáze</h3>
 
-Zde vložte grafické schéma relační databáze (tabulek v databázi).
+<img src="scheme.png">
 
 <h2>Instalace</h2>
-
-Stručně popište: 
+ 
+<h4>Systémové požiadavky:</h4>
 <ul>
-<li>postup instalace na server,</li>
-<li>softwarové požadavky (verze PHP apod.),</li>
-<li>jak rozbalit, konfigurovat, inicializovat databázi, ...</li>
+	<li>pre správne fungovanie nášho projektu je potrebné mať nainštalované PHP verzia 8.1.30. 
+	<li>pre databázový systém sa využíva MySQL 
+	<li>projekt bol testovaný v prehliadači Google Chrome</li>
+</ul>
+<h4>Konfigurácia databázy:</h4>
+<ul>
+	<li>po stiahnutí archívu treba obsah rozbaliť do požadovanéj zložky na serveri</li>
+	<li>vytvorte databázu na serveri</li>
+	<li>vytvorte užívateľa a nastavte pripojovacie údaje v súbore db_config.php</li>
+	<li>inicializujte databázu pomocou skriptu my.sql</li>
 </ul>
 
 <h2>Známé problémy</h2>
