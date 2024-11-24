@@ -12,7 +12,7 @@ $status = $_GET['status'];
 
 // Query to get pending reservations with user details, reservation_id, and tickets_count
 $query = "
-    SELECT r.reservation_id, u.name, u.lastname, r.tickets_count
+    SELECT r.reservation_id, u.name, u.lastname, r.user_id, r.tickets_count
     FROM reservations r
     JOIN users u ON r.user_id = u.user_id
     WHERE r.conference_id = ? AND r.status = ?
@@ -29,7 +29,7 @@ $stmt->bind_param("is", $conference_id, $status);
 $stmt->execute();
 
 // Use bind_result to fetch the necessary data
-$stmt->bind_result($reservation_id, $name, $lastname, $tickets_count);
+$stmt->bind_result($reservation_id, $name, $lastname, $user_id, $tickets_count);
 
 $reservations = [];
 while ($stmt->fetch()) {
@@ -37,6 +37,7 @@ while ($stmt->fetch()) {
         'reservation_id' => $reservation_id,
         'name' => $name,
         'lastname' => $lastname,
+        'user_id' => $user_id,
         'tickets_count' => $tickets_count
     ];
 }

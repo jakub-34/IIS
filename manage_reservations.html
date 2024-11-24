@@ -31,7 +31,6 @@
             <input type="text" id="searchBar" placeholder="Search by last name...">
         </div>
         <ul id="reservationList">
-            <!-- Reservations will be dynamically populated here -->
         </ul>
     </div>
 
@@ -117,7 +116,7 @@
                         cancelButton.classList.add('cancel-button');
                         cancelButton.addEventListener('click', () => {
                             const reservationId = reservation.reservation_id;
-                            cancelReservation(reservationId, listItem);
+                            cancelReservation(reservationId, listItem, reservation.user_id);
                         });
                     
                         // Confirm Payment Button
@@ -165,7 +164,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ reservation_id: reservationId })
+                body: JSON.stringify({ reservation_id: reservationId})
             })
                 .then(response => response.json())
                 .then(data => {
@@ -187,26 +186,19 @@
         }
 
         // Cancel reservation and remove it from the database
-        function cancelReservation(reservationId, listItem) {
+        function cancelReservation(reservationId, listItem, user_id) {
             if (confirm("Are you sure to cancel this reservation?")) {
-                fetch('remove_from_reservations.php', {
+                fetch('cancel_reservations.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ reservation_id: reservationId })
+                    body: JSON.stringify({ reservation_id: reservationId, user_id: user_id })
                 })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
                             listItem.remove();
-                            console.log('Reservation canceled successfully:', reservationId);
-                        
-                            // Check if the list is now empty
-                            const reservationList = document.getElementById('reservationList');
-                            if (reservationList.children.length === 0) {
-                                alert('All pending reservations have been processed.');
-                            }
                         }
                         else {
                             alert('Failed to cancel reservation: ' + data.error);
