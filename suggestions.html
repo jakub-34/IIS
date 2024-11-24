@@ -249,11 +249,6 @@
 
                         
                     checkbox.addEventListener('change', () => {
-                        document.querySelector(`#date-${currentCount}`).disabled = checkbox.checked;
-                        document.querySelector(`#start_time-${currentCount}`).disabled = checkbox.checked;
-                        document.querySelector(`#end_time-${currentCount}`).disabled = checkbox.checked;
-                        document.querySelector(`#room-${currentCount}`).disabled = checkbox.checked;
-                        
                         if (checkbox.checked) {
                             const dateInput = document.getElementById(`date-${currentCount}`);
                             const startTimeInput = document.getElementById(`start_time-${currentCount}`);
@@ -333,6 +328,11 @@
 
                             updatePresentationStatus(conference.presentation_id, checkbox.checked ? 'approved' : 'not_approved')
                         }
+
+                        document.querySelector(`#date-${currentCount}`).disabled = checkbox.checked;
+                        document.querySelector(`#start_time-${currentCount}`).disabled = checkbox.checked;
+                        document.querySelector(`#end_time-${currentCount}`).disabled = checkbox.checked;
+                        document.querySelector(`#room-${currentCount}`).disabled = checkbox.checked;
                     });
                     
                     const label = document.createElement('label');
