@@ -108,7 +108,7 @@
                                 const reservationId = deleteButton.getAttribute('data-reservation-id');
                                 if (confirm(`Are you sure you want to delete this reservation?`)) {
                                     removeReservation(reservationId);
-                                    loadReservations();
+                                    location.reload();
                                 }
                             });
 
@@ -117,7 +117,7 @@
                                 const reservationId = payButton.getAttribute('data-reservation-id');
                                 if (confirm(`Do you want to pay for this reservation?`)) {
                                     processPayment(reservationId);
-                                    loadReservations();
+                                    location.reload();
                                 }
                             });
                         
