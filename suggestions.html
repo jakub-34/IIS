@@ -237,19 +237,31 @@
                     checkbox.id = `checkbox-${count}`;
                     checkbox.name = `conference-${count}`;
                     checkbox.title = "Add to conference";
-                    checkbox.value = conference.presentation_id;
+                    checkbox.value = 0;
                     
                     // If the status is "approved", the checkbox will be checked.
                     checkbox.checked = (conference.status == 'approved');
+                    if (checkbox.checked)
+                    {
+                        checkbox.value = 1;
+                    }
                     statusInput[currentCount] = conference.status;
 
+                        
                     checkbox.addEventListener('change', () => {
+                        document.querySelector(`#date-${currentCount}`).disabled = checkbox.checked;
+                        document.querySelector(`#start_time-${currentCount}`).disabled = checkbox.checked;
+                        document.querySelector(`#end_time-${currentCount}`).disabled = checkbox.checked;
+                        document.querySelector(`#room-${currentCount}`).disabled = checkbox.checked;
+                        
                         if (checkbox.checked) {
                             const dateInput = document.getElementById(`date-${currentCount}`);
                             const startTimeInput = document.getElementById(`start_time-${currentCount}`);
                             const endTimeInput = document.getElementById(`end_time-${currentCount}`);
                             const roomInput = document.getElementById(`room-${currentCount}`);
                             
+                            console.log(dateInput);
+
                             // Checking if all required fields are filled in
                             if (!dateInput.value || !startTimeInput.value || !endTimeInput.value || !roomInput.value) {
                                 alert('Please fill in all required fields before adding to the conference.');
@@ -350,6 +362,26 @@
                 mainContainer.appendChild(leftColumn);
                 mainContainer.appendChild(rightColumn);
                 tableBody.appendChild(mainContainer);
+                for (let i = 0; i < count; i++) {
+                    const dateInput = document.querySelector(`#date-${i}`);
+                    const startTimeInput = document.querySelector(`#start_time-${i}`);
+                    const endTimeInput = document.querySelector(`#end_time-${i}`);
+                    const roomInput = document.querySelector(`#room-${i}`);
+                    const checkbox = document.querySelector(`#checkbox-${i}`);
+                    if (checkbox && checkbox.checked) {
+                        dateInput.disabled = true;                        
+                        startTimeInput.disabled = true;                        
+                        endTimeInput.disabled = true;                        
+                        roomInput.disabled = true;                                                
+                    }
+
+                    /*if (checkbox.checked) {
+                        console.log("ADAS")
+                        dateInput.disabled = true;
+                    }*/
+
+                    
+                }
             })
     </script>
 

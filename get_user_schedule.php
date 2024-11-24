@@ -19,13 +19,13 @@ $query = "
         p.date, 
         p.start_time, 
         p.end_time,
+        p.speaker_id,
         p.room_name
-    FROM user_presentation up
-    JOIN presentations p ON up.presentation_id = p.presentation_id
-    WHERE up.user_id = ? AND p.status = 'approved'
+    FROM presentations p
+    LEFT JOIN user_presentation up ON up.presentation_id = p.presentation_id
+    WHERE (up.user_id = ? OR p.speaker_id = ?) AND p.status = 'approved'
     ORDER BY p.date ASC, p.start_time ASC
 ";
-
 $stmt = $conn->prepare($query);
 if (!$stmt) {
     header('Content-Type: application/json');
@@ -33,21 +33,23 @@ if (!$stmt) {
     exit;
 }
 
-$stmt->bind_param("i", $user_id);
+$stmt->bind_param("ii", $user_id, $user_id);
 $stmt->execute();
 
 // Bind the result variables
-$stmt->bind_result($presentation_id, $title, $description, $date, $start_time, $end_time, $room_name);
+$stmt->bind_result($presentation_id, $title, $description, $date, $start_time, $end_time, $speaker_id, $room_name);
 
 $schedule = [];
 while ($stmt->fetch()) {
     $schedule[] = [
+        'user_id' => $user_id,
         'presentation_id' => $presentation_id,
         'title' => $title,
         'description' => $description,
         'date' => $date,
         'start_time' => $start_time,
         'end_time' => $end_time,
+        'speaker_id' => $speaker_id,
         'room_name' => $room_name,
     ];
 }

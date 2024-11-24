@@ -1,7 +1,7 @@
 <?php
 include 'db_config.php';
 
-$sql = "SELECT user_id, name, lastname, username, role FROM users ORDER BY username ASC";
+$sql = "SELECT user_id, name, lastname, username, role FROM users WHERE username IS NOT NULL ORDER BY username ASC";
 $result = $conn->query($sql);
 
 $users = [];

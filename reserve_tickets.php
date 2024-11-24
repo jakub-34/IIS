@@ -8,6 +8,7 @@ $conference_id = isset($_GET['conference_id']) ? intval($_GET['conference_id']) 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $lastname = $_POST['lastname'];
+    $email = $_POST['email'];
     $tickets_count = $_POST['tickets_count'];
     $status = $_POST['payment_status'];
 
@@ -53,8 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Add new user into database
-    $stmt = $conn->prepare("INSERT INTO users (name, lastname, role) VALUES (?, ?, 'guest')");
-    $stmt->bind_param("ss", $name, $lastname);
+    $stmt = $conn->prepare("INSERT INTO users (name, lastname, email, role) VALUES (?, ?, ?, 'guest')");
+    $stmt->bind_param("sss", $name, $lastname, $email);
     if ($stmt->execute()) {
         $user_id = $conn->insert_id; 
     } 

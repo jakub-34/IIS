@@ -5,6 +5,7 @@ session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
+    $email = $_POST['email'];
     $lastname = $_POST['lastname'];
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -13,8 +14,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
     // Add new user into database
-    $stmt = $conn->prepare("INSERT INTO users (name, lastname, username, password, role) VALUES (?, ?, ?, ?, 'registered')");
-    $stmt->bind_param("ssss", $name, $lastname, $username, $hashed_password);
+    $stmt = $conn->prepare("INSERT INTO users (name, lastname, email, username, password, role) VALUES (?, ?, ?, ?, ?, 'registered')");
+    $stmt->bind_param("sssss", $name, $lastname, $email, $username, $hashed_password);
     
     if ($stmt->execute()) {
         // Auto login after registration

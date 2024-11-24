@@ -82,7 +82,7 @@
                                         
                         row.innerHTML = `
                             <td>${presentation.title}</td>
-                            <td>${presentation.description}</td>
+                            <td style="max-width: 25vw;">${presentation.description}</td>
                             <td>${presentation.date.split('-').reverse().join('.')}</td>
                             <td>${startTime} - ${endTime}</td>
                             <td>${presentation.room_name}</td>
@@ -93,20 +93,27 @@
                                     style="cursor: pointer; color: red;">&times;</span>
                             </td>
                         `;
-                        
-                        // Add a deletion event
-                        const cancelIcon = row.querySelector('.cancel-icon');
-                        cancelIcon.addEventListener('click', () => {
-                            const presentationId = cancelIcon.getAttribute('data-presentation-id');
-                            console.log(`Removing presentation with ID: ${presentationId}`);
-                        
-                            if (presentationId && confirm(`Are you sure you want to remove "${presentation.title}" from your schedule?`)) {
-                                removeFromSchedule(presentationId, row);
-                            } 
-                            else {
-                                console.error("Presentation ID is undefined or removal was cancelled.");
-                            }
-                        });
+
+                        if (presentation.speaker_id == presentation.user_id) {
+                            row.style.backgroundColor = '#e1e15f';
+
+                            const cancelIcon = row.querySelector('.cancel-icon');
+                            cancelIcon.style.cursor = 'not-allowed';
+                            cancelIcon.style.color = 'grey';
+                        } 
+                        else {
+                            const cancelIcon = row.querySelector('.cancel-icon');
+                            cancelIcon.addEventListener('click', () => {
+                                const presentationId = cancelIcon.getAttribute('data-presentation-id');
+                                
+                                if (presentationId && confirm(`Are you sure you want to remove "${presentation.title}" from your schedule?`)) {
+                                    removeFromSchedule(presentationId, row);
+                                } 
+                                else {
+                                    console.error("Presentation ID is undefined or removal was cancelled.");
+                                }
+                            });
+                        }
                     
                         tbody.appendChild(row);
                     });
