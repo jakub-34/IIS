@@ -36,12 +36,11 @@
 </dl>
 
 <h2>Uživatelé systému pro testování</h2>
-<p>Uveďte prosím existující zástupce <strong>všech rolí uživatelů</strong>.</p>
 <table>
 <tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
 <tr><td>admin</td><td>admin</td><td>Administrátor</td></tr>
-<tr><td>prodavac</td><td>prodavac</td><td>Prodavač</td></tr>
-<tr><td>franta</td><td>franta</td><td>Zákazník</td></tr>
+<tr><td>jan</td><td>jan</td><td>Registrovaný užívateľ</td></tr>
+<tr><td>pavel</td><td>pavel</td><td>Registrovaný užívateľ</td></tr>
 </table>
 
 <h3>Video</h3>
@@ -49,6 +48,9 @@
 <p> <a href = https://www.youtube.com/watch?v=dqm7KUPKMx4&ab_channel=JanFurik >https://www.youtube.com/watch?v=dqm7KUPKMx4&ab_channel=JanFurik</a></p> 
 
 <h2>Implementace</h2>
+<p>
+	Naša aplikácia je informačný systém pre správu konferencií. Umožňuje užívateľom vytvárať konferencie, vytvárať návrhy prezentácií, rezervovať lístky na konferencie a spravovať rezervácie. <br> Projekt je implementovaný v jazyku PHP a využíva databázu MySQL.
+</p>
 <p>
 	<h3>administrátor:</h3>
 	<ul>
@@ -62,7 +64,7 @@
 			<li>update_presentation_status.php - schválenie/odobratie prezentácie</li>
 			<li>update_presentation.php - priradenie miestnosti a času prezentácii</li>
 			<li>confirm_payment.php - potvrdenie platby za rezervované lístky</li>
-			<li>remove_from_reservations.php - odstránenie rezervovaných lístkov</li>
+			<li>cancel_reservations.php - odstránenie rezervovaných lístkov</li>
 		</ul><br>
 		<li>create_presentation.php - vytvorenie návrhu na prezentáciu</li>
 		<h4>prednášajúci na konferencii:</h4>
